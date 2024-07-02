@@ -9,6 +9,6 @@ namespace MultasLectura.Controlador.Interfaz
 {
     public interface ICalidadHojaResLecturistaController
     {
-        void CrearTablaLecturistaInconformidades(ExcelWorksheet hoja, ExcelRange rango);
+        void CrearTablaLecturistaInconformidades(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino);
     }
 }

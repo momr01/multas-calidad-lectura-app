@@ -150,7 +150,7 @@ namespace MultasLectura.Controlador
                     AgregarContenidoHojaResumen(hojaBase, hojaResumen, rangoCalidadDetalles);
 
                 AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
-                    AgregarContenidoHojaResLecturista(hojaResLecturista, rangoCalXOperario);
+                    AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBase, hojaResLecturista);
                 /* AgregarContenidoHojaResLecturista();
                  AgregarContenidoHojaCantXOperario();
                  AgregarContenidoHojaCuadros();*/
@@ -226,9 +226,9 @@ namespace MultasLectura.Controlador
 
         }
 
-        private void AgregarContenidoHojaResLecturista(ExcelWorksheet hoja, ExcelRange rango)
+        private void AgregarContenidoHojaResLecturista(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino)
         {
-            _hojaResLecturistaController.CrearTablaLecturistaInconformidades(hoja, rango);
+            _hojaResLecturistaController.CrearTablaLecturistaInconformidades(hojaCantXOper, hojaCalidadDetalles, hojaDestino);
         }
 
       /*  private void CrearTablaDinTipoEstado(ExcelWorksheet hoja, ExcelRange rango)
