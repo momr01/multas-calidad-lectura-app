@@ -403,7 +403,7 @@ namespace MultasLectura.Controllers
 
             var rangoHojaResLecturista = hojaDestino.Cells[hojaDestino.Dimension.Address];
 
-            LibroExcelModel.AplicarBordesARango(rangoHojaResLecturista);
+            LibroExcelModel.AplicarBordeFinoARango(rangoHojaResLecturista);
 
             //hojaDestino.Cells.AutoFitColumns();
 

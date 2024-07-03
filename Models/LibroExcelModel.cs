@@ -2,6 +2,7 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +30,34 @@ namespace MultasLectura.Models
             }
         }
 
-        static public void AplicarBordesARango(ExcelRangeBase rango)
+        static public void AplicarBordeFinoARango(ExcelRangeBase rango)
         {
             rango.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
             rango.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
             rango.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
             rango.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        }
+
+        static public void AplicarBordeGruesoARango(ExcelRangeBase rango)
+        {
+            rango.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            rango.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            rango.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            rango.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+        }
+
+        static public void FormatoMoneda(ExcelRange rango)
+        {
+            using (ExcelRange celda = rango)
+            {
+                celda.Style.Numberformat.Format = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)";
+            }
+        }
+
+        static public void FondoSolido(ExcelRange rango, Color color)
+        {
+            rango.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            rango.Style.Fill.BackgroundColor.SetColor(color);
         }
 
         static public string ValidarFormato(string filePath)

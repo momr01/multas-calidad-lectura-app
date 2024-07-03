@@ -218,8 +218,8 @@ namespace MultasLectura.Controllers
         {
             //  _hojaResumenController.Prueba();
             _hojaResumenController.CrearTablaDinTipoEstado(hojaResumen, rango);
-            _hojaResumenController.CrearTablaMetodoLineal(hojaResumen, hojaBase, baremos);
-            _hojaResumenController.CrearTablaTotales(hojaResumen);
+            Dictionary<string, double> totales = _hojaResumenController.CrearTablaMetodoLineal(hojaResumen, hojaBase, baremos);
+            _hojaResumenController.CrearTablaTotales(hojaResumen, totales, new() { ["t1"] = 34, ["t2"] = 45 }, baremos);
             _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen);
             _hojaResumenController.CrearTablaBaremosMetas(hojaResumen, baremos, metas);
             hojaResumen.Cells.AutoFitColumns();
