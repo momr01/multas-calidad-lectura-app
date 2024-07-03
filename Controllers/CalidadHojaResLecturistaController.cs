@@ -1,5 +1,5 @@
-﻿using MultasLectura.Controlador.Interfaz;
-using MultasLectura.Modelo;
+﻿using MultasLectura.Interfaces;
+using MultasLectura.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Sorting;
 using OfficeOpenXml.Style;
@@ -11,14 +11,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controlador
+namespace MultasLectura.Controllers
 {
     public class Empleado
     {
-         private string nombre;
-         private int leidos;
-         private int inconformidades;
-         private double proporcion;
+        private string nombre;
+        private int leidos;
+        private int inconformidades;
+        private double proporcion;
         //private double proporcion;
 
         public string Nombre { get { return nombre; } set { nombre = value; } }
@@ -31,28 +31,29 @@ namespace MultasLectura.Controlador
             proporcion = (double)inconformidades / leidos;
         }
 
-        public Empleado(string Nombre, int Leidos, int Inconformidades) { 
+        public Empleado(string Nombre, int Leidos, int Inconformidades)
+        {
             this.Nombre = Nombre;
             this.Leidos = Leidos;
             this.Inconformidades = Inconformidades;
         }
 
-      
 
 
-      
-       
-     /*   public int CantidadT1 { get { return cantidadT1; } set { cantidadT1 = value; } }
-        public int CantidadT2 { get { return cantidadT2; } set { cantidadT2 = value; } }
-        public int CantidadT3 { get { return cantidadT3; } set { cantidadT3 = value; } }
-        public int CantidadAlturaT1 { get { return cantidadAlturaT1; } set { cantidadAlturaT1 = value; } }
-        public int CantidadAlturaT3 { get { return cantidadAlturaT3; } set { cantidadAlturaT3 = value; } }
-        public double ImporteT1 { get { return importeT1; } set { importeT1 = value; } }
 
-        public void CalcularImporteT1(double baremo)
-        {
-            importeT1 = 2 * cantidadT1 * baremo;
-        }*/
+
+
+        /*   public int CantidadT1 { get { return cantidadT1; } set { cantidadT1 = value; } }
+           public int CantidadT2 { get { return cantidadT2; } set { cantidadT2 = value; } }
+           public int CantidadT3 { get { return cantidadT3; } set { cantidadT3 = value; } }
+           public int CantidadAlturaT1 { get { return cantidadAlturaT1; } set { cantidadAlturaT1 = value; } }
+           public int CantidadAlturaT3 { get { return cantidadAlturaT3; } set { cantidadAlturaT3 = value; } }
+           public double ImporteT1 { get { return importeT1; } set { importeT1 = value; } }
+
+           public void CalcularImporteT1(double baremo)
+           {
+               importeT1 = 2 * cantidadT1 * baremo;
+           }*/
     }
 
 
@@ -111,11 +112,12 @@ namespace MultasLectura.Controlador
                             if (!contieneTexto)
                             {
                                 empleados.Add(new Empleado(Nombre: cellValue.ToString(), Leidos: int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString()), Inconformidades: 0));
-                            } else
+                            }
+                            else
                             {
                                 empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString())).FirstOrDefault().Leidos += int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString());
                             }
-                          
+
 
                         }
                     }
@@ -139,7 +141,7 @@ namespace MultasLectura.Controlador
                     if (cellValue != null)
                     {
                         if (cellValue.ToString()!.Contains("SYMESA"))
-                        { 
+                        {
                             totalInconformidades++;
                             /*if (!empleados.Nombre.Contains(cellValue.ToString()!))
                             {
@@ -167,7 +169,7 @@ namespace MultasLectura.Controlador
             }
 
 
-          
+
             /*
 
             foreach (Empleado empleado in empleados)
@@ -196,7 +198,7 @@ namespace MultasLectura.Controlador
                 numPrimeraCelda++;
             }*/
 
-            foreach(Empleado empleado in empleados)
+            foreach (Empleado empleado in empleados)
             {
                 empleado.CalcularProporcion();
                 totalIdeal += empleado.Leidos * 0.0015;
@@ -207,22 +209,25 @@ namespace MultasLectura.Controlador
 
             double idealPorcentaje = 0.0015;
 
-            
+
+
+
+
 
             Color verdeLetra = Color.FromArgb(1, 0, 97, 0);
             Color verdeFondo = Color.FromArgb(1, 198, 239, 206);
-            Color rojoLetra;
-            Color rojoFondo;
-            Color amarilloLetra;
-            Color amarilloFondo;
+            Color rojoLetra = Color.FromArgb(1, 156, 0, 6);
+            Color rojoFondo = Color.FromArgb(1, 255, 199, 206);
+            Color amarilloLetra = Color.FromArgb(1, 156, 101, 0);
+            Color amarilloFondo = Color.FromArgb(1, 255, 235, 156);
 
 
             for (int i = 0; i < empleadosOrdenados.Count; i++)
             {
-               // MessageBox.Show(empleadosOrdenados[i].Proporcion.ToString());
+                // MessageBox.Show(empleadosOrdenados[i].Proporcion.ToString());
                 // double acumulado = 0;
                 double incXOp = empleadosOrdenados[i].Inconformidades / empleadosOrdenados[i].Leidos;
-               
+
 
                 hojaDestino.Cells[$"A{numPrimeraCelda}"].Value = empleadosOrdenados[i].Nombre;
                 hojaDestino.Cells[$"B{numPrimeraCelda}"].Value = empleadosOrdenados[i].Leidos;
@@ -241,17 +246,18 @@ namespace MultasLectura.Controlador
                 // hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+{acumulado}";
 
 
-                if(i == 0)
+                if (i == 0)
                 {
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}";
-                } else
+                }
+                else
                 {
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}";
                 }
 
                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
 
-               
+
 
 
                 double ideal = empleadosOrdenados[i].Leidos * idealPorcentaje;
@@ -283,15 +289,16 @@ namespace MultasLectura.Controlador
                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Value = desvio;
                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
 
-                if (Math.Round(desvio,4) <= -0.045)
+                if (Math.Round(desvio, 4) <= -0.045)
                 {
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1,255,199,206));
+                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 199, 206));
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 0, 6));
 
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
-                } else if(Math.Round(desvio, 4) >= -0.0449 && Math.Round(desvio, 4) <= -0.001)
+                }
+                else if (Math.Round(desvio, 4) >= -0.0449 && Math.Round(desvio, 4) <= -0.001)
                 {
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 235, 156));
@@ -299,7 +306,8 @@ namespace MultasLectura.Controlador
 
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-                } else
+                }
+                else
                 {
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 198, 239, 206));
@@ -397,27 +405,27 @@ namespace MultasLectura.Controlador
 
             LibroExcelModel.AplicarBordesARango(rangoHojaResLecturista);
 
-            hojaDestino.Cells.AutoFitColumns();
+            //hojaDestino.Cells.AutoFitColumns();
 
-          /*  hojaDestino.Cells["B26"].Value = totalT1;
-            hojaDestino.Cells["B27"].Value = totalT2;
-            hojaDestino.Cells["B28"].Value = totalT3;
-            hojaDestino.Cells["B29"].Value = totalAltT1;
-            hojaDestino.Cells["B30"].Value = totalAltT3;
-            hojaDestino.Cells["B31"].Value = totalT1 + totalT2 + totalT3 + totalAltT1 + totalAltT3;
+            /*  hojaDestino.Cells["B26"].Value = totalT1;
+              hojaDestino.Cells["B27"].Value = totalT2;
+              hojaDestino.Cells["B28"].Value = totalT3;
+              hojaDestino.Cells["B29"].Value = totalAltT1;
+              hojaDestino.Cells["B30"].Value = totalAltT3;
+              hojaDestino.Cells["B31"].Value = totalT1 + totalT2 + totalT3 + totalAltT1 + totalAltT3;
 
-            double importeT1 = totalT1 * baremos.T1 * 2;
-            double importeT2 = totalT2 * baremos.T2 * 2;
-            double importeT3 = totalT3 * baremos.T3 * 2;
-            double importeAltT1 = totalAltT1 * baremos.AlturaT1 * 2;
-            double importeAltT3 = totalAltT3 * baremos.AlturaT3 * 2;
+              double importeT1 = totalT1 * baremos.T1 * 2;
+              double importeT2 = totalT2 * baremos.T2 * 2;
+              double importeT3 = totalT3 * baremos.T3 * 2;
+              double importeAltT1 = totalAltT1 * baremos.AlturaT1 * 2;
+              double importeAltT3 = totalAltT3 * baremos.AlturaT3 * 2;
 
-            hojaDestino.Cells["C26"].Value = $"$ {importeT1}";
-            hojaDestino.Cells["C27"].Value = $"$ {importeT2}";
-            hojaDestino.Cells["C28"].Value = $"$ {importeT3}";
-            hojaDestino.Cells["C29"].Value = $"$ {importeAltT1}";
-            hojaDestino.Cells["C30"].Value = $"$ {importeAltT3}";
-            hojaDestino.Cells["C31"].Value = "$ " + (importeT1 + importeT2 + importeT3 + importeAltT1 + importeAltT3);*/
+              hojaDestino.Cells["C26"].Value = $"$ {importeT1}";
+              hojaDestino.Cells["C27"].Value = $"$ {importeT2}";
+              hojaDestino.Cells["C28"].Value = $"$ {importeT3}";
+              hojaDestino.Cells["C29"].Value = $"$ {importeAltT1}";
+              hojaDestino.Cells["C30"].Value = $"$ {importeAltT3}";
+              hojaDestino.Cells["C31"].Value = "$ " + (importeT1 + importeT2 + importeT3 + importeAltT1 + importeAltT3);*/
         }
     }
 }

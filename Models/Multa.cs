@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Modelo
+namespace MultasLectura.Models
 {
     public class Multa
     {

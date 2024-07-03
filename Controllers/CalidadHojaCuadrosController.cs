@@ -1,4 +1,4 @@
-﻿using MultasLectura.Controlador.Interfaz;
+﻿using MultasLectura.Interfaces;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controlador
+namespace MultasLectura.Controllers
 {
     public class CalidadHojaCuadrosController : ICalidadHojaCuadrosController
     {

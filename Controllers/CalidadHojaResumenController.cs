@@ -1,5 +1,5 @@
-﻿using MultasLectura.Controlador.Interfaz;
-using MultasLectura.Modelo;
+﻿using MultasLectura.Interfaces;
+using MultasLectura.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table.PivotTable;
@@ -9,26 +9,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controlador
+namespace MultasLectura.Controllers
 {
     public class CalidadHojaResumenController : ICalidadHojaResumenController
     {
-        private BaremoModel baremos;
+      //  private BaremoModel baremos;
         public CalidadHojaResumenController()
         {
-            baremos = new BaremoModel
+          /*  baremos = new BaremoModel
             {
                 T1 = 304.91,
                 T2 = 2814.51,
                 T3 = 304.91,
                 AlturaT1 = 3572.63,
                 AlturaT3 = 3572.63
-            };
+            };*/
         }
 
-        public void CrearTablaBaremosMetas(ExcelWorksheet hoja)
+        public void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas)
         {
-            hoja.Cells["F1"].Value = "Baremo Lectura desde el 01/02/2024";
+            hoja.Cells["F1"].Value = $"Baremo Lectura desde el {baremos.Fecha}";
             hoja.Cells["F2"].Value = "T1 y T3";
             hoja.Cells["F3"].Value = "T2";
             hoja.Cells["F4"].Value = "Altura T1 y T3";
@@ -36,7 +36,19 @@ namespace MultasLectura.Controlador
             hoja.Cells["F6"].Value = "Meta 2";
             hoja.Cells["F7"].Value = "Obtenido";
 
+            hoja.Cells["G2"].Value = baremos.T1;
+            hoja.Cells["G3"].Value = baremos.T2;
+            hoja.Cells["G4"].Value = baremos.AlturaT1;
+            hoja.Cells["G5"].Value = metas.Meta1;
+            hoja.Cells["G6"].Value = metas.Meta2;
+
+            hoja.Cells[$"G5"].Style.Numberformat.Format = "0.00%";
+            hoja.Cells[$"G6"].Style.Numberformat.Format = "0.00%";
+
+
             LibroExcelModel.AplicarBordesARango(hoja.Cells["F2:G7"]);
+
+          
         }
 
         public void CrearTablaDinTipoEstado(ExcelWorksheet hoja, ExcelRange rango)
@@ -46,16 +58,16 @@ namespace MultasLectura.Controlador
             pivotTable.RowFields.Add(pivotTable.Fields["tipo_certificacion"]);
             pivotTable.RowFields.Add(pivotTable.Fields["estado"]);
             pivotTable.DataFields.Add(pivotTable.Fields["nic"]);
-            pivotTable.DataFields[0].Function = OfficeOpenXml.Table.PivotTable.DataFieldFunctions.Count;
+            pivotTable.DataFields[0].Function = DataFieldFunctions.Count;
 
             //label2.Text =  pivotTable.Fields.Count.ToString();
 
-           
+
         }
 
-        public void CrearTablaMetodoLineal(ExcelWorksheet hojaDestino, ExcelWorksheet hojaOrigen)
+        public void CrearTablaMetodoLineal(ExcelWorksheet hojaDestino, ExcelWorksheet hojaOrigen, BaremoModel baremos)
         {
-            
+
 
 
             // Obtener el número total de filas y columnas en la hoja de cálculo
@@ -132,11 +144,17 @@ namespace MultasLectura.Controlador
             double importeAltT3 = totalAltT3 * baremos.AlturaT3 * 2;
 
             hojaDestino.Cells["C26"].Value = $"$ {importeT1}";
-            hojaDestino.Cells["C27"].Value = $"$ {importeT2}";
+            hojaDestino.Cells["C27"].Value = importeT2;
             hojaDestino.Cells["C28"].Value = $"$ {importeT3}";
             hojaDestino.Cells["C29"].Value = $"$ {importeAltT1}";
             hojaDestino.Cells["C30"].Value = $"$ {importeAltT3}";
             hojaDestino.Cells["C31"].Value = "$ " + (importeT1 + importeT2 + importeT3 + importeAltT1 + importeAltT3);
+
+
+            using (ExcelRange celda = hojaDestino.Cells["C27"])
+            {
+                celda.Style.Numberformat.Format = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)";
+            }
         }
 
         public void CrearTablaTotales(ExcelWorksheet hoja)

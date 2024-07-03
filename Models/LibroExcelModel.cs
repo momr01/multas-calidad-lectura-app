@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Modelo
+namespace MultasLectura.Models
 {
     public class LibroExcelModel
     {
         //static public void IniciarProcesoCarga(System.Windows.Forms.TextBox txt, System.Action<string> funcionCargarLibro)
-          static public void IniciarProcesoCarga(System.Windows.Forms.TextBox txt)
+        static public void IniciarProcesoCarga(TextBox txt)
         {
             string filePath = CargarLibroExcel();
 
@@ -116,7 +116,7 @@ namespace MultasLectura.Modelo
 
                     pathGuardarConversion += "libro-conversion.xlsx";
 
-                   //  MessageBox.Show(partesPath[partesPath.Length - 1]);
+                    //  MessageBox.Show(partesPath[partesPath.Length - 1]);
 
                     // Guardar como .xlsx
                     using (FileStream fileOut = new FileStream(pathGuardarConversion, FileMode.Create))
@@ -127,8 +127,9 @@ namespace MultasLectura.Modelo
                     return pathGuardarConversion;
                 }
 
-               
-            } catch
+
+            }
+            catch
             {
                 return string.Empty;
             }
@@ -151,10 +152,10 @@ namespace MultasLectura.Modelo
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     // Mostrar la ruta del archivo seleccionado en el TextBox
-                   // txtRutaCalidadDetalles.Text = openFileDialog.FileName;
+                    // txtRutaCalidadDetalles.Text = openFileDialog.FileName;
 
                     // AbrirArchivo2(openFileDialog.FileName);
-                 //   calidadController.CargarLibroCalidadDetalles(openFileDialog.FileName);
+                    //   calidadController.CargarLibroCalidadDetalles(openFileDialog.FileName);
 
                     // Aquí puedes realizar cualquier operación adicional con el archivo seleccionado
                     // Por ejemplo, cargar y procesar el archivo Excel usando EPPlus como se mostró anteriormente
@@ -165,11 +166,12 @@ namespace MultasLectura.Modelo
                     //txtRutaCalidadDetalles.Text = string.Empty;
                     return "";
                 }
-            } catch
+            }
+            catch
             {
                 return "";
             }
-           
+
         }
 
         static public void ConvertirTextoANumero(ExcelRange rango)

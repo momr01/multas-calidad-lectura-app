@@ -11,18 +11,18 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using MultasLectura.Modelo;
-using MultasLectura.Controlador.Interfaz;
-using MultasLectura.Controlador;
 using System.Runtime.CompilerServices;
 using NPOI.SS.Formula.Functions;
+using MultasLectura.Interfaces;
+using MultasLectura.Models;
+using MultasLectura.Controllers;
 
 namespace MultasLectura
 {
     public partial class GenerarLibroCalidad : Form
     {
         private readonly ILibroCalidadController _calidadController;
-       // private readonly Action<string> _cargarLibroExcelFuncion;
+        // private readonly Action<string> _cargarLibroExcelFuncion;
         private readonly BaremoModel _baremos = new BaremoModel();
         private readonly MetaModel _metas = new MetaModel();
 
@@ -31,21 +31,21 @@ namespace MultasLectura
             InitializeComponent();
             ArchivoTextoModel.VerificarExisteArchivoBaremos(_baremos);
             ArchivoTextoModel.VerificarExisteArchivoMetas(_metas);
-            _calidadController = new LibroCalidadController(_baremos!);
-           // _cargarLibroExcelFuncion = _calidadController.CargarLibroExcel;
+            _calidadController = new LibroCalidadController(_baremos!, _metas!);
+            // _cargarLibroExcelFuncion = _calidadController.CargarLibroExcel;
 
         }
 
 
         private void btnCalidadDetalles_Click(object sender, EventArgs e)
         {
-           // LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles, _cargarLibroExcelFuncion);
+            // LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles, _cargarLibroExcelFuncion);
             LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles);
         }
 
         private void btnReclamosDetalles_Click(object sender, EventArgs e)
         {
-          //  LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles, _cargarLibroExcelFuncion);
+            //  LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles, _cargarLibroExcelFuncion);
             LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles);
             /* string filePath = LibroExcelModel.CargarLibroExcel();
 
@@ -62,7 +62,7 @@ namespace MultasLectura
 
         private void btnCalXOperarios_Click(object sender, EventArgs e)
         {
-           // LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios, _cargarLibroExcelFuncion);
+            // LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios, _cargarLibroExcelFuncion);
             LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios);
             /* string filePath = LibroExcelModel.CargarLibroExcel();
 
@@ -208,8 +208,8 @@ namespace MultasLectura
 
         private void CargarDatosMetas()
         {
-            meta1.Text = $"{_metas.Meta1}%";
-            meta2.Text = $"{_metas.Meta2}%";
+            meta1.Text = $"{_metas.Meta1 * 100}%";
+            meta2.Text = $"{_metas.Meta2 * 100}%";
 
         }
 
@@ -223,10 +223,11 @@ namespace MultasLectura
 
         private void btnGenerarLibroFinal_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text))
+            if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text))
             {
                 LibroExcelModel.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
-            } else
+            }
+            else
             {
                 _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text);
             }

@@ -62,6 +62,7 @@
             // 
             txtRutaCalidadDetalles.Location = new Point(6, 36);
             txtRutaCalidadDetalles.Name = "txtRutaCalidadDetalles";
+            txtRutaCalidadDetalles.ReadOnly = true;
             txtRutaCalidadDetalles.Size = new Size(334, 23);
             txtRutaCalidadDetalles.TabIndex = 0;
             // 
@@ -79,6 +80,7 @@
             // 
             txtRutaReclamosDetalles.Location = new Point(6, 102);
             txtRutaReclamosDetalles.Name = "txtRutaReclamosDetalles";
+            txtRutaReclamosDetalles.ReadOnly = true;
             txtRutaReclamosDetalles.Size = new Size(334, 23);
             txtRutaReclamosDetalles.TabIndex = 2;
             // 
@@ -110,6 +112,7 @@
             // 
             txtRutaCalXOperarios.Location = new Point(6, 171);
             txtRutaCalXOperarios.Name = "txtRutaCalXOperarios";
+            txtRutaCalXOperarios.ReadOnly = true;
             txtRutaCalXOperarios.Size = new Size(334, 23);
             txtRutaCalXOperarios.TabIndex = 5;
             // 

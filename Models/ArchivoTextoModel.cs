@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Modelo
+namespace MultasLectura.Models
 {
     public class ArchivoTextoModel
     {
@@ -66,6 +66,9 @@ namespace MultasLectura.Modelo
                         case "alturat3":
                             _baremos.AlturaT3 = double.Parse(arregloLinea[1]);
                             break;
+                        case "fecha":
+                            _baremos.Fecha = arregloLinea[1];
+                            break;
 
                     }
                 }
@@ -101,6 +104,7 @@ namespace MultasLectura.Modelo
         {
             using (StreamWriter writer = new StreamWriter(filePath))
             {
+                writer.WriteLine("fecha;01/02/2024");
                 writer.WriteLine("t1;0");
                 writer.WriteLine("t2;0");
                 writer.WriteLine("t3;0");
@@ -118,6 +122,6 @@ namespace MultasLectura.Modelo
             }
         }
 
-      
+
     }
 }
