@@ -16,6 +16,8 @@ using NPOI.SS.Formula.Functions;
 using MultasLectura.Interfaces;
 using MultasLectura.Models;
 using MultasLectura.Controllers;
+using MultasLectura.Views;
+using MultasLectura.Helpers;
 
 namespace MultasLectura
 {
@@ -26,13 +28,16 @@ namespace MultasLectura
         private readonly BaremoModel _baremos = new BaremoModel();
         private readonly MetaModel _metas = new MetaModel();
 
+        private Loader loaderForm;
+
         public GenerarLibroCalidad()
         {
             InitializeComponent();
-            ArchivoTextoModel.VerificarExisteArchivoBaremos(_baremos);
-            ArchivoTextoModel.VerificarExisteArchivoMetas(_metas);
+            ArchivoTextoHelper.VerificarExisteArchivoBaremos(_baremos);
+            ArchivoTextoHelper.VerificarExisteArchivoMetas(_metas);
             _calidadController = new LibroCalidadController(_baremos!, _metas!);
             // _cargarLibroExcelFuncion = _calidadController.CargarLibroExcel;
+            loaderForm = new Loader();
 
         }
 
@@ -40,13 +45,13 @@ namespace MultasLectura
         private void btnCalidadDetalles_Click(object sender, EventArgs e)
         {
             // LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles, _cargarLibroExcelFuncion);
-            LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles);
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalidadDetalles);
         }
 
         private void btnReclamosDetalles_Click(object sender, EventArgs e)
         {
             //  LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles, _cargarLibroExcelFuncion);
-            LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles);
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaReclamosDetalles);
             /* string filePath = LibroExcelModel.CargarLibroExcel();
 
              if (string.IsNullOrEmpty(filePath))
@@ -63,7 +68,7 @@ namespace MultasLectura
         private void btnCalXOperarios_Click(object sender, EventArgs e)
         {
             // LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios, _cargarLibroExcelFuncion);
-            LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios);
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalXOperarios);
             /* string filePath = LibroExcelModel.CargarLibroExcel();
 
              if (string.IsNullOrEmpty(filePath))
@@ -221,25 +226,71 @@ namespace MultasLectura
 
         }
 
+        private void addControls(UserControl uc)
+        {
+            // panelContainer.Controls.Clear();
+            //  uc.Dock = DockStyle.Fill;
+            // panelContainer.Controls.Add(uc);
+            //  panel3.Controls.Add(uc);
+            //  uc.BringToFront();
+        }
+
+        private void MostrarLoader()
+        {
+            // pictureBox1.Visible = true;
+            // Aquí puedes iniciar tu tarea larga
+            //  UC_Loader loader = new UC_Loader();
+            // addControls(loader);
+            loaderForm.StartPosition = FormStartPosition.CenterParent; // Aparece centrado respecto al formulario principal
+            loaderForm.Show(this);
+        }
+
+        private void OcultarLoader()
+        {
+            //  pictureBox1.Visible = false;
+            // Aquí puedes finalizar tu tarea larga
+            // UC_Loader loader = new UC_Loader();
+            // addControls(loader);
+            loaderForm.Hide();
+        }
+
         private void btnGenerarLibroFinal_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text))
-            {
-                LibroExcelModel.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
-            }
-            else
-            {
-                //double importeCertificacion = 0;
+          /*  MostrarLoader();
+           
+            Task.Run(() =>
+            {*/
+               
 
-                if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
+                if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text))
                 {
-                    _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, importeCertificacion);
-                } else
-                {
-                    LibroExcelModel.MostrarMensaje("Por favor ingrese un importe de certificación válido.", true);
+                    LibroExcelHelper.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
                 }
-                   
-            }
+                else
+                {
+                  
+
+                    if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
+                    {
+                        _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, importeCertificacion);
+                    }
+                    else
+                    {
+                        LibroExcelHelper.MostrarMensaje("Por favor ingrese un importe de certificación válido.", true);
+                    }
+
+                }
+
+               
+              /*  this.Invoke((MethodInvoker)delegate
+                {
+                    OcultarLoader();
+                  
+                });
+            });*/
+
+
+            
         }
     }
 }

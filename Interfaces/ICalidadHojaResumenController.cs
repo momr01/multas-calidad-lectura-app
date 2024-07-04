@@ -12,8 +12,8 @@ namespace MultasLectura.Interfaces
     {
         void CrearTablaDinTipoEstado(ExcelWorksheet hoja, ExcelRange rango);
         Dictionary<string, double> CrearTablaMetodoLineal(ExcelWorksheet hojaResumen, ExcelWorksheet hojaBase, BaremoModel baremos);
-        void CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion);
-        void CrearTablaValorFinalMulta(ExcelWorksheet hoja);
-        void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas);
+        Dictionary<string, double> CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion);
+        void CrearTablaValorFinalMulta(ExcelWorksheet hoja, double propInconformidades, double importeTotalMetLineal, double importeTotalCertificacion, MetaModel metas);
+        void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas, double propInconformidades);
     }
 }

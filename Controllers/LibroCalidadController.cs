@@ -1,5 +1,6 @@
 ﻿using Aspose.Cells;
 using Microsoft.Office.Interop.Excel;
+using MultasLectura.Helpers;
 using MultasLectura.Interfaces;
 using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
@@ -46,22 +47,50 @@ namespace MultasLectura.Controllers
 
         public void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper, double importeCertificacion)
         {
-            string archivoAUtilizar = LibroExcelModel.ValidarFormato(pathCalidadDetalles);
+            string archivoAUtilizar = LibroExcelHelper.ValidarFormato(pathCalidadDetalles);
 
-            string archivoCalXOper = LibroExcelModel.ValidarFormato(pathCalXOper);
+            string archivoCalXOper = LibroExcelHelper.ValidarFormato(pathCalXOper);
 
             if (string.IsNullOrEmpty(archivoAUtilizar) || string.IsNullOrEmpty(archivoCalXOper))
             {
-                LibroExcelModel.MostrarMensaje("Error al convertir el archivo .xls a .xlsx", true);
+                LibroExcelHelper.MostrarMensaje("Error al convertir el archivo .xls a .xlsx", true);
             }
             else
             {
-                GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion);
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+                // Configurar el diálogo de guardar archivo
+                saveFileDialog1.Filter = "Archivos Excel (*.xlsx)|*.xlsx";// Filtro de tipos de archivo
+                saveFileDialog1.FilterIndex = 1; // Índice del filtro predeterminado
+                saveFileDialog1.RestoreDirectory = true; // Restaurar el directorio al cerrar el diálogo
+
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    // Obtener la ruta del archivo seleccionado
+                    string rutaArchivo = saveFileDialog1.FileName;
+
+                    // Aquí puedes realizar acciones adicionales, como guardar el archivo
+                    // Por ejemplo, guardar un archivo de texto
+                    // File.WriteAllText(rutaArchivo, contenido);
+
+                    // Mostrar un mensaje con la ruta seleccionada (opcional)
+                    GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion, rutaArchivo);
+                    MessageBox.Show($"Archivo guardado en: {rutaArchivo}", "Guardar archivo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+
+
+
+
+
+
+
+              //  GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion);
             }
 
         }
 
-        private void GenerarLibroCalidad(string filePath, string pathCalXOper, double importeCertificacion)
+        private void GenerarLibroCalidad(string filePath, string pathCalXOper, double importeCertificacion, string rutaGuardar)
         {
             // Abrir y leer el archivo Excel con EPPlus
             using (ExcelPackage excelPackageCalXOper = new ExcelPackage(new FileInfo(pathCalXOper)))
@@ -99,7 +128,7 @@ namespace MultasLectura.Controllers
 
                     // Obtener el rango de celdas en la hoja copiada
                     var rangoHojaCantXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
-                    LibroExcelModel.ConvertirTextoANumero(rangoHojaCantXOperario);
+                    LibroExcelHelper.ConvertirTextoANumero(rangoHojaCantXOperario);
 
 
                     // Obtener el rango de celdas en la hoja copiada
@@ -207,7 +236,8 @@ namespace MultasLectura.Controllers
 
 
                     // Guardar archivo
-                    excelPackage.SaveAs(new FileInfo(@"C:/Users/maxio/Documents/archivo3.xlsx"));
+                    //  excelPackage.SaveAs(new FileInfo(@"C:/Users/maxio/Documents/archivo3.xlsx"));
+                    excelPackage.SaveAs(new FileInfo(rutaGuardar));
 
 
                 }
@@ -227,10 +257,11 @@ namespace MultasLectura.Controllers
             //  _hojaResumenController.Prueba();
             _hojaResumenController.CrearTablaDinTipoEstado(hojaResumen, rango);
             Dictionary<string, double> totales = _hojaResumenController.CrearTablaMetodoLineal(hojaResumen, hojaBase, baremos);
-            _hojaResumenController.CrearTablaTotales(hojaResumen, totales, new() { ["t1"] = 43, ["t2"] = 5 }, baremos, hojaCalXOperario, importeCertificacion);
-            _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen);
-            _hojaResumenController.CrearTablaBaremosMetas(hojaResumen, baremos, metas);
+            Dictionary<string, double> propInMasImpMetLineal = _hojaResumenController.CrearTablaTotales(hojaResumen, totales, new() { ["t1"] = 43, ["t2"] = 5 }, baremos, hojaCalXOperario, importeCertificacion);
+            _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen, propInMasImpMetLineal["propInconformidades"], propInMasImpMetLineal["totalMetLineal"],  importeCertificacion, metas);
+            _hojaResumenController.CrearTablaBaremosMetas(hojaResumen, baremos, metas, propInMasImpMetLineal["propInconformidades"]);
             hojaResumen.Cells.AutoFitColumns();
+            hojaResumen.Column(2).AutoFit();
 
         }
 

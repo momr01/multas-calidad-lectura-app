@@ -1,4 +1,5 @@
 ﻿using Aspose.Cells.Charts;
+using MultasLectura.Helpers;
 using MultasLectura.Interfaces;
 using MultasLectura.Models;
 using OfficeOpenXml;
@@ -56,7 +57,7 @@ namespace MultasLectura.Controllers
     public class CalidadHojaResumenController : ICalidadHojaResumenController
     {
 
-        public void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas)
+        public void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas, double propInconformidades)
         {
             Dictionary<string, double> datos = new()
             {
@@ -65,7 +66,7 @@ namespace MultasLectura.Controllers
                 ["Altura T1 y T3"] = baremos.AlturaT1,
                 ["Meta"] = metas.Meta1,
                 ["Meta 2"] = metas.Meta2,
-                ["Obtenido"] = 0
+                ["Obtenido"] = propInconformidades
             };
 
             var claves = datos.Keys;
@@ -84,11 +85,12 @@ namespace MultasLectura.Controllers
                     hoja.Cells[$"G{numFila}"].Style.Numberformat.Format = "0.00%";
                 } else
                 {
-                    LibroExcelModel.FormatoMoneda(hoja.Cells[$"G{numFila}"]);
+                    LibroExcelHelper.FormatoMoneda(hoja.Cells[$"G{numFila}"]);
                 }
                 numFila++;
             }
-            LibroExcelModel.AplicarBordeGruesoARango(hoja.Cells[$"F{primeraFilaEstilizar}:G{numFila - 1}"]);
+            LibroExcelHelper.AplicarBordeGruesoARango(hoja.Cells[$"F{primeraFilaEstilizar}:G{numFila - 1}"]);
+            LibroExcelHelper.FormatoNegrita(hoja.Cells[$"F1:G{numFila - 1}"]);
           
         }
 
@@ -168,9 +170,9 @@ namespace MultasLectura.Controllers
             hojaDestino.Cells[$"B{numFila}"].Value = totalCantidades;
             hojaDestino.Cells[$"C{numFila}"].Value = totalImportes;
             
-            LibroExcelModel.FondoSolido(hojaDestino.Cells[$"C{numFila}"], Color.FromArgb(1, 252, 213, 180));
-            LibroExcelModel.FormatoMoneda(hojaDestino.Cells[$"C{comienzoTabla + 1}:C{numFila}"]);
-            LibroExcelModel.AplicarBordeFinoARango(hojaDestino.Cells[$"A{comienzoTabla}:C{numFila}"]);
+            LibroExcelHelper.FondoSolido(hojaDestino.Cells[$"C{numFila}"], Color.FromArgb(1, 252, 213, 180));
+            LibroExcelHelper.FormatoMoneda(hojaDestino.Cells[$"C{comienzoTabla + 1}:C{numFila}"]);
+            LibroExcelHelper.AplicarBordeFinoARango(hojaDestino.Cells[$"A{comienzoTabla}:C{numFila}"]);
 
             return new() {
                 ["total"] = totalCantidades,
@@ -179,9 +181,9 @@ namespace MultasLectura.Controllers
 
         }
 
-        public void CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion)
+        public Dictionary<string, double> CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion)
         {
-            int totalCertificado = LibroExcelModel.SumarColumnaInt(hojaCalXOperario, 5, 2);
+            int totalCertificado = LibroExcelHelper.SumarColumnaInt(hojaCalXOperario, 5, 2);
 
             List<MetodoLineal> datos = new() {
                 new MetodoLineal("Anomalias de Facturacion NC", int.Parse(totales["total"].ToString()), totales["importe"]),
@@ -217,6 +219,8 @@ namespace MultasLectura.Controllers
 
             }
 
+      
+
             foreach (MetodoLineal dato in datos)
             {
 
@@ -240,20 +244,61 @@ namespace MultasLectura.Controllers
             hoja.Cells[$"D{filaInicial + datos.Count}"].Value = propInconformidades;
 
             //hoja.Cells[$"G{numFila}"].Style.Numberformat.Format = "0.00%";
-            LibroExcelModel.FormatoPorcentaje(hoja.Cells[$"D{filaInicial + datos.Count}"]);
+            LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"D{filaInicial + datos.Count}"]);
 
-            LibroExcelModel.AplicarBordeFinoARango(hoja.Cells[$"A{filaInicial}:C{filaInicial + datos.Count}"]);
-            LibroExcelModel.FormatoMoneda(hoja.Cells[$"C{filaInicial + 1}:C{filaInicial + datos.Count}"]);
+            LibroExcelHelper.AplicarBordeFinoARango(hoja.Cells[$"A{filaInicial}:C{filaInicial + datos.Count}"]);
+            LibroExcelHelper.FormatoMoneda(hoja.Cells[$"C{filaInicial + 1}:C{filaInicial + datos.Count}"]);
+            LibroExcelHelper.FormatoNegrita(hoja.Cells[$"B{filaInicial + datos.Count}:C{filaInicial + datos.Count}"]);
+
+            hoja.Cells.AutoFitColumns();
+
+            return new() { 
+                
+               ["propInconformidades"] = propInconformidades,
+                ["totalMetLineal"] = datos.Where(dato => dato.Descripcion.ToLower().Contains("metodo lineal")).FirstOrDefault().Importe
+            };
         }
 
-        public void CrearTablaValorFinalMulta(ExcelWorksheet hoja)
+        public void CrearTablaValorFinalMulta(ExcelWorksheet hoja, double propInconformidades, double importeTotalMetLineal, double importeTotalCertificacion, MetaModel metas)
         {
-            hoja.Cells["A44"].RichText.Add("Multa").Bold = true;
-            hoja.Cells["B44"].Value = 0;
-            hoja.Cells["C44"].Value = 0;
+            double importeMultaFinal = 0;
 
-            hoja.Cells["A44:B44"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            hoja.Cells["A44:B44"].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+            if (propInconformidades > metas.Meta1)
+            {
+                if(propInconformidades > metas.Meta2)
+                {
+                    double calcAuxiliar = (propInconformidades - metas.Meta1) / (0.01 - metas.Meta1);
+                    importeMultaFinal = importeTotalCertificacion * Math.Pow(calcAuxiliar, 2);
+                   
+                } else
+                {
+                    importeMultaFinal = (propInconformidades * importeTotalMetLineal) / propInconformidades;
+                }
+            }
+
+            double propMultaSobreTotalCert = importeMultaFinal / importeTotalCertificacion;
+
+
+
+
+
+
+            // hoja.Cells["A44"].RichText.Add("Multa").Bold = true;
+            hoja.Cells["A44"].Value = "Multa";
+            hoja.Cells["B44"].Value = importeMultaFinal;
+            hoja.Cells["C44"].Value = propMultaSobreTotalCert;
+
+            //  hoja.Cells["A44:B44"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            // hoja.Cells["A44:B44"].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+
+            LibroExcelHelper.FormatoNegrita(hoja.Cells["A44:B44"]);
+            LibroExcelHelper.FondoSolido(hoja.Cells["A44:B44"], Color.FromArgb(1, 255, 192, 0));
+            LibroExcelHelper.FormatoMoneda(hoja.Cells["B44"]);
+            LibroExcelHelper.FormatoPorcentaje(hoja.Cells["C44"]);
+            LibroExcelHelper.AplicarBordeFinoARango(hoja.Cells["A44:B44"]);
+
+            hoja.Cells.AutoFitColumns();
+
         }
     }
 }

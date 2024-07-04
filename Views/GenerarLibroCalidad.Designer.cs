@@ -31,8 +31,9 @@
             txtRutaCalidadDetalles = new TextBox();
             btnCalidadDetalles = new Button();
             txtRutaReclamosDetalles = new TextBox();
-            label1 = new Label();
             groupBox1 = new GroupBox();
+            txtImporteCertificacion = new TextBox();
+            label3 = new Label();
             txtRutaCalXOperarios = new TextBox();
             btnCalXOperarios = new Button();
             btnReclamosDetalles = new Button();
@@ -53,8 +54,6 @@
             meta1 = new Label();
             label10 = new Label();
             label9 = new Label();
-            label3 = new Label();
-            txtImporteCertificacion = new TextBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -70,12 +69,13 @@
             // 
             // btnCalidadDetalles
             // 
+            btnCalidadDetalles.BackColor = SystemColors.ActiveCaption;
             btnCalidadDetalles.Location = new Point(376, 25);
             btnCalidadDetalles.Name = "btnCalidadDetalles";
             btnCalidadDetalles.Size = new Size(196, 63);
             btnCalidadDetalles.TabIndex = 1;
             btnCalidadDetalles.Text = "Cargar Archivo Calidad Detalles";
-            btnCalidadDetalles.UseVisualStyleBackColor = true;
+            btnCalidadDetalles.UseVisualStyleBackColor = false;
             btnCalidadDetalles.Click += btnCalidadDetalles_Click;
             // 
             // txtRutaReclamosDetalles
@@ -85,15 +85,6 @@
             txtRutaReclamosDetalles.ReadOnly = true;
             txtRutaReclamosDetalles.Size = new Size(364, 29);
             txtRutaReclamosDetalles.TabIndex = 2;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(651, 414);
-            label1.Name = "label1";
-            label1.Size = new Size(38, 15);
-            label1.TabIndex = 3;
-            label1.Text = "label1";
             // 
             // groupBox1
             // 
@@ -106,12 +97,29 @@
             groupBox1.Controls.Add(txtRutaCalidadDetalles);
             groupBox1.Controls.Add(txtRutaReclamosDetalles);
             groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox1.Location = new Point(12, 37);
+            groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(578, 292);
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "Subir Archivos";
+            // 
+            // txtImporteCertificacion
+            // 
+            txtImporteCertificacion.Location = new Point(254, 238);
+            txtImporteCertificacion.Name = "txtImporteCertificacion";
+            txtImporteCertificacion.Size = new Size(318, 29);
+            txtImporteCertificacion.TabIndex = 7;
+            txtImporteCertificacion.Text = "105147160,4";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(6, 241);
+            label3.Name = "label3";
+            label3.Size = new Size(242, 21);
+            label3.TabIndex = 6;
+            label3.Text = "Importe de Certificación Lectura=";
             // 
             // txtRutaCalXOperarios
             // 
@@ -123,33 +131,37 @@
             // 
             // btnCalXOperarios
             // 
+            btnCalXOperarios.BackColor = SystemColors.ActiveCaption;
             btnCalXOperarios.Location = new Point(376, 162);
             btnCalXOperarios.Name = "btnCalXOperarios";
             btnCalXOperarios.Size = new Size(196, 63);
             btnCalXOperarios.TabIndex = 4;
             btnCalXOperarios.Text = "Cargar Archivo Calidad por Operarios";
-            btnCalXOperarios.UseVisualStyleBackColor = true;
+            btnCalXOperarios.UseVisualStyleBackColor = false;
             btnCalXOperarios.Click += btnCalXOperarios_Click;
             // 
             // btnReclamosDetalles
             // 
+            btnReclamosDetalles.BackColor = SystemColors.ActiveCaption;
             btnReclamosDetalles.Location = new Point(376, 94);
             btnReclamosDetalles.Name = "btnReclamosDetalles";
             btnReclamosDetalles.Size = new Size(196, 63);
             btnReclamosDetalles.TabIndex = 3;
             btnReclamosDetalles.Text = "Cargar Archivo Reclamos Detalles";
-            btnReclamosDetalles.UseVisualStyleBackColor = true;
+            btnReclamosDetalles.UseVisualStyleBackColor = false;
             btnReclamosDetalles.Click += btnReclamosDetalles_Click;
             // 
             // btnGenerarLibroFinal
             // 
-            btnGenerarLibroFinal.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            btnGenerarLibroFinal.Location = new Point(12, 357);
+            btnGenerarLibroFinal.BackColor = SystemColors.HotTrack;
+            btnGenerarLibroFinal.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            btnGenerarLibroFinal.ForeColor = Color.White;
+            btnGenerarLibroFinal.Location = new Point(12, 332);
             btnGenerarLibroFinal.Name = "btnGenerarLibroFinal";
             btnGenerarLibroFinal.Size = new Size(853, 42);
             btnGenerarLibroFinal.TabIndex = 5;
             btnGenerarLibroFinal.Text = "GENERAR ARCHIVO CALIDAD";
-            btnGenerarLibroFinal.UseVisualStyleBackColor = true;
+            btnGenerarLibroFinal.UseVisualStyleBackColor = false;
             btnGenerarLibroFinal.Click += btnGenerarLibroFinal_Click;
             // 
             // groupBox2
@@ -165,7 +177,7 @@
             groupBox2.Controls.Add(baremosT1);
             groupBox2.Controls.Add(label2);
             groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox2.Location = new Point(596, 37);
+            groupBox2.Location = new Point(596, 12);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(269, 167);
             groupBox2.TabIndex = 6;
@@ -269,7 +281,7 @@
             groupBox3.Controls.Add(label10);
             groupBox3.Controls.Add(label9);
             groupBox3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox3.Location = new Point(596, 235);
+            groupBox3.Location = new Point(596, 210);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(269, 94);
             groupBox3.TabIndex = 7;
@@ -312,35 +324,17 @@
             label9.TabIndex = 0;
             label9.Text = "META 1=";
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(6, 241);
-            label3.Name = "label3";
-            label3.Size = new Size(242, 21);
-            label3.TabIndex = 6;
-            label3.Text = "Importe de Certificación Lectura=";
-            // 
-            // txtImporteCertificacion
-            // 
-            txtImporteCertificacion.Location = new Point(254, 238);
-            txtImporteCertificacion.Name = "txtImporteCertificacion";
-            txtImporteCertificacion.Size = new Size(318, 29);
-            txtImporteCertificacion.TabIndex = 7;
-            txtImporteCertificacion.Text = "105147160,4";
-            // 
             // GenerarLibroCalidad
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(877, 450);
+            ClientSize = new Size(877, 413);
+            Controls.Add(groupBox1);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(btnGenerarLibroFinal);
-            Controls.Add(groupBox1);
-            Controls.Add(label1);
             Name = "GenerarLibroCalidad";
-            Text = "Form1";
+            Text = "Generar Libro Calidad";
             Load += GenerarLibroCalidad_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
@@ -349,7 +343,6 @@
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -357,7 +350,6 @@
         private TextBox txtRutaCalidadDetalles;
         private Button btnCalidadDetalles;
         private TextBox txtRutaReclamosDetalles;
-        private Label label1;
         private GroupBox groupBox1;
         private TextBox txtRutaCalXOperarios;
         private Button btnCalXOperarios;

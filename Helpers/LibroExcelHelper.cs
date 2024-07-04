@@ -1,4 +1,5 @@
-﻿using NPOI.HSSF.UserModel;
+﻿using Aspose.Cells;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
@@ -9,9 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Models
+namespace MultasLectura.Helpers
 {
-    public class LibroExcelModel
+    public class LibroExcelHelper
     {
         //static public void IniciarProcesoCarga(System.Windows.Forms.TextBox txt, System.Action<string> funcionCargarLibro)
         static public void IniciarProcesoCarga(TextBox txt)
@@ -32,18 +33,18 @@ namespace MultasLectura.Models
 
         static public void AplicarBordeFinoARango(ExcelRangeBase rango)
         {
-            rango.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            rango.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            rango.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            rango.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+            rango.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            rango.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            rango.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            rango.Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
 
         static public void AplicarBordeGruesoARango(ExcelRangeBase rango)
         {
-            rango.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            rango.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            rango.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            rango.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            rango.Style.Border.Top.Style = ExcelBorderStyle.Thick;
+            rango.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            rango.Style.Border.Left.Style = ExcelBorderStyle.Thick;
+            rango.Style.Border.Right.Style = ExcelBorderStyle.Thick;
         }
 
         static public void FormatoMoneda(ExcelRange rango)
@@ -56,7 +57,12 @@ namespace MultasLectura.Models
 
         static public void FormatoPorcentaje(ExcelRange rango)
         {
-           rango.Style.Numberformat.Format = "0.00%";
+            rango.Style.Numberformat.Format = "0.00%";
+        }
+
+        static public void FormatoNegrita(ExcelRange rango)
+        {
+            rango.Style.Font.Bold = true;
         }
 
         static public void FondoSolido(ExcelRange rango, Color color)
@@ -223,7 +229,7 @@ namespace MultasLectura.Models
         {
             int totalSuma = 0;
 
-           // int columnToSum = 5; // Columna que quieres sumar (por ejemplo, A=1, B=2, etc.)
+            // int columnToSum = 5; // Columna que quieres sumar (por ejemplo, A=1, B=2, etc.)
             //int startRow = 2; // Fila inicial donde comienzan los datos (puede variar según el archivo)
             int filaFinal = hoja.Dimension.End.Row; // Última fila con datos en la hoja
 
@@ -246,6 +252,6 @@ namespace MultasLectura.Models
             return totalSuma;
         }
 
-      
+
     }
 }

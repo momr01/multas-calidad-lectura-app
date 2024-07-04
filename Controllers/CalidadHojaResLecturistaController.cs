@@ -1,5 +1,5 @@
-﻿using MultasLectura.Interfaces;
-using MultasLectura.Models;
+﻿using MultasLectura.Helpers;
+using MultasLectura.Interfaces;
 using OfficeOpenXml;
 using OfficeOpenXml.Sorting;
 using OfficeOpenXml.Style;
@@ -403,7 +403,7 @@ namespace MultasLectura.Controllers
 
             var rangoHojaResLecturista = hojaDestino.Cells[hojaDestino.Dimension.Address];
 
-            LibroExcelModel.AplicarBordeFinoARango(rangoHojaResLecturista);
+            LibroExcelHelper.AplicarBordeFinoARango(rangoHojaResLecturista);
 
             //hojaDestino.Cells.AutoFitColumns();
 

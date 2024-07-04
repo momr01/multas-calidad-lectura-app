@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MultasLectura.Models;
 
-namespace MultasLectura.Models
+namespace MultasLectura.Helpers
 {
-    public class ArchivoTextoModel
+    public class ArchivoTextoHelper
     {
         public static void VerificarExisteArchivoBaremos(BaremoModel _baremos)
         {
