@@ -41,15 +41,15 @@ namespace MultasLectura.Controllers
            // return _importe;
         }
 
-        public void SumarCantidades(int cantidad2, int cantidad3)
+        public void SumarCantidades(int cantidad2)
         {
-            _cantidad += cantidad2 + cantidad3;
+            _cantidad += cantidad2;
 
         }
 
-        public void SumarImportes(double importe2, double importe3)
+        public void SumarImportes(double importe2)
         {
-            _importe += importe2 + importe3;
+            _importe += importe2;
         }
 
     }
@@ -88,7 +88,7 @@ namespace MultasLectura.Controllers
                 }
                 numFila++;
             }
-            LibroExcelModel.AplicarBordeGruesoARango(hoja.Cells[$"F{primeraFilaEstilizar}:G{numFila}"]);
+            LibroExcelModel.AplicarBordeGruesoARango(hoja.Cells[$"F{primeraFilaEstilizar}:G{numFila - 1}"]);
           
         }
 
@@ -179,20 +179,22 @@ namespace MultasLectura.Controllers
 
         }
 
-        public void CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos)
+        public void CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion)
         {
-            int numFila = 35;
+            int totalCertificado = LibroExcelModel.SumarColumnaInt(hojaCalXOperario, 5, 2);
 
             List<MetodoLineal> datos = new() {
                 new MetodoLineal("Anomalias de Facturacion NC", int.Parse(totales["total"].ToString()), totales["importe"]),
                 new MetodoLineal("Reclamos procedentes T1", reclamos["t1"], 0),
                 new MetodoLineal("Reclamos procedentes T2", reclamos["t2"], 0),
                 new MetodoLineal("Total de NC por Metodo Lineal (0,15% al 0,3%)", int.Parse(totales["total"].ToString()), totales["importe"]),
-                new MetodoLineal("Totales Certificado", 0, 0),
+                new MetodoLineal("Totales Certificado", totalCertificado, importeCertificacion),
             };
 
             int totalCantidadesReclamos = reclamos["t1"] + reclamos["t2"];
             double totalImportesReclamos = 0;
+            int numFila = 35;
+            int filaInicial = 35;
 
             hoja.Cells[$"A{numFila}"].Value = "Descripción";
             hoja.Cells[$"B{numFila}"].Value = "TOTAL";
@@ -211,38 +213,37 @@ namespace MultasLectura.Controllers
                     }
 
                     totalImportesReclamos += dato.Importe;
-                } 
+                }
 
-               
             }
 
+            foreach (MetodoLineal dato in datos)
+            {
+
+                if(dato.Descripcion.ToLower().Contains("metodo lineal"))
+                {
+                    dato.SumarCantidades(totalCantidadesReclamos);
+                    dato.SumarImportes(totalImportesReclamos);  
+                }
+
+                hoja.Cells[$"A{numFila + 1}"].Value = dato.Descripcion;
+                hoja.Cells[$"B{numFila + 1}"].Value = dato.Cantidad;
+                hoja.Cells[$"C{numFila + 1}"].Value = dato.Importe;
+
+                numFila++;
 
 
+            }
 
-            hoja.Cells["A35"].Value = "Descripción";
-            hoja.Cells["A36"].Value = "Anomalias de Facturacion NC";
-            hoja.Cells["A37"].Value = "Reclamos procedentes T1";
-            hoja.Cells["A38"].Value = "Reclamos procedentes T2";
-            hoja.Cells["A39"].Value = "Total de NC por Metodo Lineal (0,15% al 0,3%)";
-            hoja.Cells["A40"].Value = "Totales Certificado";
+            double propInconformidades = (double)datos.Where(dato => dato.Descripcion.ToLower().Contains("metodo lineal")).FirstOrDefault().Cantidad / datos.Where(dato => dato.Descripcion.ToLower().Contains("certificado")).FirstOrDefault().Cantidad;
 
-            hoja.Cells["B35"].Value = "TOTAL";
-            hoja.Cells["B36"].Value = totales["total"];
-            hoja.Cells["B37"].Value = 0;
-            hoja.Cells["B38"].Value = 0;
-            hoja.Cells["B39"].Value = 0;
-            hoja.Cells["B40"].Value = 0;
+            hoja.Cells[$"D{filaInicial + datos.Count}"].Value = propInconformidades;
 
-            hoja.Cells["C35"].Value = "IMPORTE";
-            hoja.Cells["C36"].Value = totales["importe"];
-            hoja.Cells["C37"].Value = 0;
-            hoja.Cells["C38"].Value = 0;
-            hoja.Cells["C39"].Value = 0;
-            hoja.Cells["C40"].Value = 0;
+            //hoja.Cells[$"G{numFila}"].Style.Numberformat.Format = "0.00%";
+            LibroExcelModel.FormatoPorcentaje(hoja.Cells[$"D{filaInicial + datos.Count}"]);
 
-            hoja.Cells["D40"].Value = 0;
-
-            LibroExcelModel.AplicarBordeFinoARango(hoja.Cells["A35:C40"]);
+            LibroExcelModel.AplicarBordeFinoARango(hoja.Cells[$"A{filaInicial}:C{filaInicial + datos.Count}"]);
+            LibroExcelModel.FormatoMoneda(hoja.Cells[$"C{filaInicial + 1}:C{filaInicial + datos.Count}"]);
         }
 
         public void CrearTablaValorFinalMulta(ExcelWorksheet hoja)

@@ -54,6 +54,11 @@ namespace MultasLectura.Models
             }
         }
 
+        static public void FormatoPorcentaje(ExcelRange rango)
+        {
+           rango.Style.Numberformat.Format = "0.00%";
+        }
+
         static public void FondoSolido(ExcelRange rango, Color color)
         {
             rango.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -213,5 +218,34 @@ namespace MultasLectura.Models
         {
             MessageBox.Show(mensaje, esError ? "ERROR" : "ATENCIÓN", MessageBoxButtons.OK, esError ? MessageBoxIcon.Error : MessageBoxIcon.Warning);
         }
+
+        static public int SumarColumnaInt(ExcelWorksheet hoja, int colASumar, int filaInicial)
+        {
+            int totalSuma = 0;
+
+           // int columnToSum = 5; // Columna que quieres sumar (por ejemplo, A=1, B=2, etc.)
+            //int startRow = 2; // Fila inicial donde comienzan los datos (puede variar según el archivo)
+            int filaFinal = hoja.Dimension.End.Row; // Última fila con datos en la hoja
+
+            // double total = 0;
+
+            for (int fila = filaInicial; fila <= filaFinal; fila++)
+            {
+                var celda = hoja.Cells[fila, colASumar].Value;
+                if (celda != null)
+                {
+                    int datoCelda;
+                    if (int.TryParse(celda.ToString(), out datoCelda))
+                    {
+                        totalSuma += datoCelda;
+                    }
+                    // Si los datos no son numéricos, se pueden ignorar o manejar según sea necesario
+                }
+            }
+
+            return totalSuma;
+        }
+
+      
     }
 }

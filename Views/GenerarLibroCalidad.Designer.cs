@@ -53,6 +53,8 @@
             meta1 = new Label();
             label10 = new Label();
             label9 = new Label();
+            label3 = new Label();
+            txtImporteCertificacion = new TextBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -60,17 +62,17 @@
             // 
             // txtRutaCalidadDetalles
             // 
-            txtRutaCalidadDetalles.Location = new Point(6, 36);
+            txtRutaCalidadDetalles.Location = new Point(6, 43);
             txtRutaCalidadDetalles.Name = "txtRutaCalidadDetalles";
             txtRutaCalidadDetalles.ReadOnly = true;
-            txtRutaCalidadDetalles.Size = new Size(334, 23);
+            txtRutaCalidadDetalles.Size = new Size(364, 29);
             txtRutaCalidadDetalles.TabIndex = 0;
             // 
             // btnCalidadDetalles
             // 
-            btnCalidadDetalles.Location = new Point(346, 22);
+            btnCalidadDetalles.Location = new Point(376, 25);
             btnCalidadDetalles.Name = "btnCalidadDetalles";
-            btnCalidadDetalles.Size = new Size(146, 48);
+            btnCalidadDetalles.Size = new Size(196, 63);
             btnCalidadDetalles.TabIndex = 1;
             btnCalidadDetalles.Text = "Cargar Archivo Calidad Detalles";
             btnCalidadDetalles.UseVisualStyleBackColor = true;
@@ -78,10 +80,10 @@
             // 
             // txtRutaReclamosDetalles
             // 
-            txtRutaReclamosDetalles.Location = new Point(6, 102);
+            txtRutaReclamosDetalles.Location = new Point(6, 112);
             txtRutaReclamosDetalles.Name = "txtRutaReclamosDetalles";
             txtRutaReclamosDetalles.ReadOnly = true;
-            txtRutaReclamosDetalles.Size = new Size(334, 23);
+            txtRutaReclamosDetalles.Size = new Size(364, 29);
             txtRutaReclamosDetalles.TabIndex = 2;
             // 
             // label1
@@ -95,32 +97,35 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(txtImporteCertificacion);
+            groupBox1.Controls.Add(label3);
             groupBox1.Controls.Add(txtRutaCalXOperarios);
             groupBox1.Controls.Add(btnCalXOperarios);
             groupBox1.Controls.Add(btnReclamosDetalles);
             groupBox1.Controls.Add(btnCalidadDetalles);
             groupBox1.Controls.Add(txtRutaCalidadDetalles);
             groupBox1.Controls.Add(txtRutaReclamosDetalles);
+            groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             groupBox1.Location = new Point(12, 37);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(501, 242);
+            groupBox1.Size = new Size(578, 292);
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "Subir Archivos";
             // 
             // txtRutaCalXOperarios
             // 
-            txtRutaCalXOperarios.Location = new Point(6, 171);
+            txtRutaCalXOperarios.Location = new Point(6, 180);
             txtRutaCalXOperarios.Name = "txtRutaCalXOperarios";
             txtRutaCalXOperarios.ReadOnly = true;
-            txtRutaCalXOperarios.Size = new Size(334, 23);
+            txtRutaCalXOperarios.Size = new Size(364, 29);
             txtRutaCalXOperarios.TabIndex = 5;
             // 
             // btnCalXOperarios
             // 
-            btnCalXOperarios.Location = new Point(346, 157);
+            btnCalXOperarios.Location = new Point(376, 162);
             btnCalXOperarios.Name = "btnCalXOperarios";
-            btnCalXOperarios.Size = new Size(146, 48);
+            btnCalXOperarios.Size = new Size(196, 63);
             btnCalXOperarios.TabIndex = 4;
             btnCalXOperarios.Text = "Cargar Archivo Calidad por Operarios";
             btnCalXOperarios.UseVisualStyleBackColor = true;
@@ -128,9 +133,9 @@
             // 
             // btnReclamosDetalles
             // 
-            btnReclamosDetalles.Location = new Point(346, 88);
+            btnReclamosDetalles.Location = new Point(376, 94);
             btnReclamosDetalles.Name = "btnReclamosDetalles";
-            btnReclamosDetalles.Size = new Size(146, 48);
+            btnReclamosDetalles.Size = new Size(196, 63);
             btnReclamosDetalles.TabIndex = 3;
             btnReclamosDetalles.Text = "Cargar Archivo Reclamos Detalles";
             btnReclamosDetalles.UseVisualStyleBackColor = true;
@@ -138,9 +143,10 @@
             // 
             // btnGenerarLibroFinal
             // 
-            btnGenerarLibroFinal.Location = new Point(12, 308);
+            btnGenerarLibroFinal.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            btnGenerarLibroFinal.Location = new Point(12, 357);
             btnGenerarLibroFinal.Name = "btnGenerarLibroFinal";
-            btnGenerarLibroFinal.Size = new Size(776, 42);
+            btnGenerarLibroFinal.Size = new Size(853, 42);
             btnGenerarLibroFinal.TabIndex = 5;
             btnGenerarLibroFinal.Text = "GENERAR ARCHIVO CALIDAD";
             btnGenerarLibroFinal.UseVisualStyleBackColor = true;
@@ -158,9 +164,10 @@
             groupBox2.Controls.Add(label4);
             groupBox2.Controls.Add(baremosT1);
             groupBox2.Controls.Add(label2);
-            groupBox2.Location = new Point(519, 37);
+            groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBox2.Location = new Point(596, 37);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(269, 136);
+            groupBox2.Size = new Size(269, 167);
             groupBox2.TabIndex = 6;
             groupBox2.TabStop = false;
             groupBox2.Text = "Baremos";
@@ -168,90 +175,90 @@
             // baremosAlturaT3
             // 
             baremosAlturaT3.AutoSize = true;
-            baremosAlturaT3.Location = new Point(84, 110);
+            baremosAlturaT3.Location = new Point(109, 134);
             baremosAlturaT3.Name = "baremosAlturaT3";
-            baremosAlturaT3.Size = new Size(13, 15);
+            baremosAlturaT3.Size = new Size(19, 21);
             baremosAlturaT3.TabIndex = 8;
             baremosAlturaT3.Text = "0";
             // 
             // baremosAlturaT1
             // 
             baremosAlturaT1.AutoSize = true;
-            baremosAlturaT1.Location = new Point(84, 88);
+            baremosAlturaT1.Location = new Point(110, 105);
             baremosAlturaT1.Name = "baremosAlturaT1";
-            baremosAlturaT1.Size = new Size(13, 15);
+            baremosAlturaT1.Size = new Size(19, 21);
             baremosAlturaT1.TabIndex = 8;
             baremosAlturaT1.Text = "0";
             // 
             // baremosT3
             // 
             baremosT3.AutoSize = true;
-            baremosT3.Location = new Point(39, 67);
+            baremosT3.Location = new Point(50, 79);
             baremosT3.Name = "baremosT3";
-            baremosT3.Size = new Size(13, 15);
+            baremosT3.Size = new Size(19, 21);
             baremosT3.TabIndex = 7;
             baremosT3.Text = "0";
             // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(6, 110);
+            label8.Location = new Point(5, 134);
             label8.Name = "label8";
-            label8.Size = new Size(72, 15);
+            label8.Size = new Size(98, 21);
             label8.TabIndex = 6;
             label8.Text = "ALTURA T3=";
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(6, 88);
+            label7.Location = new Point(6, 106);
             label7.Name = "label7";
-            label7.Size = new Size(72, 15);
+            label7.Size = new Size(98, 21);
             label7.TabIndex = 5;
             label7.Text = "ALTURA T1=";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(6, 67);
+            label6.Location = new Point(6, 79);
             label6.Name = "label6";
-            label6.Size = new Size(27, 15);
+            label6.Size = new Size(38, 21);
             label6.TabIndex = 4;
             label6.Text = "T3=";
             // 
             // baremosT2
             // 
             baremosT2.AutoSize = true;
-            baremosT2.Location = new Point(39, 44);
+            baremosT2.Location = new Point(50, 52);
             baremosT2.Name = "baremosT2";
-            baremosT2.Size = new Size(13, 15);
+            baremosT2.Size = new Size(19, 21);
             baremosT2.TabIndex = 3;
             baremosT2.Text = "0";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(6, 44);
+            label4.Location = new Point(6, 52);
             label4.Name = "label4";
-            label4.Size = new Size(27, 15);
+            label4.Size = new Size(38, 21);
             label4.TabIndex = 2;
             label4.Text = "T2=";
             // 
             // baremosT1
             // 
             baremosT1.AutoSize = true;
-            baremosT1.Location = new Point(39, 22);
+            baremosT1.Location = new Point(50, 25);
             baremosT1.Name = "baremosT1";
-            baremosT1.Size = new Size(13, 15);
+            baremosT1.Size = new Size(19, 21);
             baremosT1.TabIndex = 1;
             baremosT1.Text = "0";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(6, 22);
+            label2.Location = new Point(6, 25);
             label2.Name = "label2";
-            label2.Size = new Size(27, 15);
+            label2.Size = new Size(38, 21);
             label2.TabIndex = 0;
             label2.Text = "T1=";
             // 
@@ -261,9 +268,10 @@
             groupBox3.Controls.Add(meta1);
             groupBox3.Controls.Add(label10);
             groupBox3.Controls.Add(label9);
-            groupBox3.Location = new Point(519, 179);
+            groupBox3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBox3.Location = new Point(596, 235);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(269, 100);
+            groupBox3.Size = new Size(269, 94);
             groupBox3.TabIndex = 7;
             groupBox3.TabStop = false;
             groupBox3.Text = "Metas";
@@ -271,44 +279,61 @@
             // meta2
             // 
             meta2.AutoSize = true;
-            meta2.Location = new Point(66, 60);
+            meta2.Location = new Point(85, 61);
             meta2.Name = "meta2";
-            meta2.Size = new Size(26, 15);
+            meta2.Size = new Size(36, 21);
             meta2.TabIndex = 9;
             meta2.Text = "0 %";
             // 
             // meta1
             // 
             meta1.AutoSize = true;
-            meta1.Location = new Point(66, 29);
+            meta1.Location = new Point(85, 31);
             meta1.Name = "meta1";
-            meta1.Size = new Size(26, 15);
+            meta1.Size = new Size(36, 21);
             meta1.TabIndex = 8;
             meta1.Text = "0 %";
             // 
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(6, 60);
+            label10.Location = new Point(6, 62);
             label10.Name = "label10";
-            label10.Size = new Size(54, 15);
+            label10.Size = new Size(73, 21);
             label10.TabIndex = 1;
             label10.Text = "META 2=";
             // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(6, 29);
+            label9.Location = new Point(6, 31);
             label9.Name = "label9";
-            label9.Size = new Size(54, 15);
+            label9.Size = new Size(73, 21);
             label9.TabIndex = 0;
             label9.Text = "META 1=";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(6, 241);
+            label3.Name = "label3";
+            label3.Size = new Size(242, 21);
+            label3.TabIndex = 6;
+            label3.Text = "Importe de Certificación Lectura=";
+            // 
+            // txtImporteCertificacion
+            // 
+            txtImporteCertificacion.Location = new Point(254, 238);
+            txtImporteCertificacion.Name = "txtImporteCertificacion";
+            txtImporteCertificacion.Size = new Size(318, 29);
+            txtImporteCertificacion.TabIndex = 7;
+            txtImporteCertificacion.Text = "105147160,4";
             // 
             // GenerarLibroCalidad
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(877, 450);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(btnGenerarLibroFinal);
@@ -354,5 +379,7 @@
         private Label baremosT3;
         private Label meta2;
         private Label meta1;
+        private TextBox txtImporteCertificacion;
+        private Label label3;
     }
 }

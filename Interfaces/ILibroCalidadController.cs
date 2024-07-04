@@ -9,7 +9,7 @@ namespace MultasLectura.Interfaces
 {
     public interface ILibroCalidadController
     {
-        void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper);
+        void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper, double importeCertificacion);
         /*  void CargarLibroCalidadDetalles(string filePath);
           void CargarLibroReclamosDetalles(string filePath);
           void CargarLibroCalidadXOperario(string filePath);

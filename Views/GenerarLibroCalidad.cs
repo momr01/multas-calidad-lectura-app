@@ -229,7 +229,16 @@ namespace MultasLectura
             }
             else
             {
-                _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text);
+                //double importeCertificacion = 0;
+
+                if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
+                {
+                    _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, importeCertificacion);
+                } else
+                {
+                    LibroExcelModel.MostrarMensaje("Por favor ingrese un importe de certificación válido.", true);
+                }
+                   
             }
         }
     }

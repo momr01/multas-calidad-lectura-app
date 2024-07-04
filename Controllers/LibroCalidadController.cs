@@ -44,7 +44,7 @@ namespace MultasLectura.Controllers
             // multa = new Multa();
         }
 
-        public void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper)
+        public void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper, double importeCertificacion)
         {
             string archivoAUtilizar = LibroExcelModel.ValidarFormato(pathCalidadDetalles);
 
@@ -56,16 +56,17 @@ namespace MultasLectura.Controllers
             }
             else
             {
-                GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper);
+                GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion);
             }
 
         }
 
-        private void GenerarLibroCalidad(string filePath, string pathCalXOper)
+        private void GenerarLibroCalidad(string filePath, string pathCalXOper, double importeCertificacion)
         {
             // Abrir y leer el archivo Excel con EPPlus
             using (ExcelPackage excelPackageCalXOper = new ExcelPackage(new FileInfo(pathCalXOper)))
             {
+                ExcelWorksheet hojaBaseCalXOp = excelPackageCalXOper.Workbook.Worksheets[0];
                 // Abrir y leer el archivo Excel con EPPlus
                 using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(filePath)))
                 {
@@ -82,7 +83,7 @@ namespace MultasLectura.Controllers
                     //creamos hojas nuevas del libro
                     ExcelWorksheet hojaResumen = excelPackage.Workbook.Worksheets.Add("Resumen");
                     ExcelWorksheet hojaResLecturista = excelPackage.Workbook.Worksheets.Add("Res-Lecturista");
-                    ExcelWorksheet hojaCantXOperario = excelPackage.Workbook.Worksheets.Add("Cant_x_Oper", excelPackageCalXOper.Workbook.Worksheets[0]);
+                    ExcelWorksheet hojaCantXOperario = excelPackage.Workbook.Worksheets.Add("Cant_x_Oper", hojaBaseCalXOp);
                     ExcelWorksheet hojaCuadros = excelPackage.Workbook.Worksheets.Add("Cuadros");
                     ExcelWorksheet hojaEliminados = excelPackage.Workbook.Worksheets.Add("ELIMINADOS");
 
@@ -153,7 +154,7 @@ namespace MultasLectura.Controllers
 
                     // hojaCantXOperario = excelPackageCalXOper.Workbook.Worksheets[0];
 
-                    AgregarContenidoHojaResumen(hojaBase, hojaResumen, rangoCalidadDetalles, _baremos, _metas);
+                    AgregarContenidoHojaResumen(hojaBase, hojaResumen, rangoCalidadDetalles, _baremos, _metas, hojaBaseCalXOp, importeCertificacion);
 
                     AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
                     AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBase, hojaResLecturista);
@@ -214,12 +215,19 @@ namespace MultasLectura.Controllers
 
         }
 
-        private void AgregarContenidoHojaResumen(ExcelWorksheet hojaBase, ExcelWorksheet hojaResumen, ExcelRange rango, BaremoModel baremos, MetaModel metas)
+        private void AgregarContenidoHojaResumen(
+            ExcelWorksheet hojaBase, 
+            ExcelWorksheet hojaResumen, 
+            ExcelRange rango, 
+            BaremoModel baremos, 
+            MetaModel metas, 
+            ExcelWorksheet hojaCalXOperario, 
+            double importeCertificacion)
         {
             //  _hojaResumenController.Prueba();
             _hojaResumenController.CrearTablaDinTipoEstado(hojaResumen, rango);
             Dictionary<string, double> totales = _hojaResumenController.CrearTablaMetodoLineal(hojaResumen, hojaBase, baremos);
-            _hojaResumenController.CrearTablaTotales(hojaResumen, totales, new() { ["t1"] = 34, ["t2"] = 45 }, baremos);
+            _hojaResumenController.CrearTablaTotales(hojaResumen, totales, new() { ["t1"] = 43, ["t2"] = 5 }, baremos, hojaCalXOperario, importeCertificacion);
             _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen);
             _hojaResumenController.CrearTablaBaremosMetas(hojaResumen, baremos, metas);
             hojaResumen.Cells.AutoFitColumns();
