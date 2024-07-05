@@ -262,17 +262,17 @@ namespace MultasLectura
             {*/
                
 
-                if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text))
+                if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text) 
+              //  || string.IsNullOrEmpty(txtRutaReclamosDetalles.Text)
+                )
                 {
                     LibroExcelHelper.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
                 }
                 else
                 {
-                  
-
                     if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
                     {
-                        _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, importeCertificacion);
+                        _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, txtRutaReclamosDetalles.Text, importeCertificacion);
                     }
                     else
                     {

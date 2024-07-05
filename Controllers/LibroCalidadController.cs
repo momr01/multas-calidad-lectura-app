@@ -20,7 +20,6 @@ namespace MultasLectura.Controllers
     {
         private readonly BaremoModel _baremos;
         private readonly MetaModel _metas;
-        // private Multa multa;
         private readonly ICalidadHojaResumenController _hojaResumenController;
         private readonly ICalidadHojaCuadrosController _hojaCuadrosController;
         private readonly ICalidadHojaResLecturistaController _hojaResLecturistaController;
@@ -34,139 +33,123 @@ namespace MultasLectura.Controllers
             _hojaResLecturistaController = new CalidadHojaResLecturistaController();
             _baremos = baremos;
             _metas = metas;
-            /*baremos = new BaremoModel
-            {
-                T1 = 304.91,
-                T2 = 2814.51,
-                T3 = 304.91,
-                AlturaT1 = 3572.63,
-                AlturaT3 = 3572.63
-            };*/
-            // multa = new Multa();
         }
 
-        public void CargarLibroExcel(string pathCalidadDetalles, string pathCalXOper, double importeCertificacion)
+        public void CargarLibroExcel(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion)
         {
-            string archivoAUtilizar = LibroExcelHelper.ValidarFormato(pathCalidadDetalles);
-
-            string archivoCalXOper = LibroExcelHelper.ValidarFormato(pathCalXOper);
-
-            if (string.IsNullOrEmpty(archivoAUtilizar) || string.IsNullOrEmpty(archivoCalXOper))
+            try
             {
-                LibroExcelHelper.MostrarMensaje("Error al convertir el archivo .xls a .xlsx", true);
-            }
-            else
-            {
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                string archCalDetalles = LibroExcelHelper.ValidarFormato(rutaCalDetalles);
+                string archCalXOperario = LibroExcelHelper.ValidarFormato(rutaCalXOper);
+                // string archReclDetalles = LibroExcelHelper.ValidarFormato(rutaReclDetalles);
+                string archReclDetalles = string.Empty;
 
-                // Configurar el diálogo de guardar archivo
-                saveFileDialog1.Filter = "Archivos Excel (*.xlsx)|*.xlsx";// Filtro de tipos de archivo
-                saveFileDialog1.FilterIndex = 1; // Índice del filtro predeterminado
-                saveFileDialog1.RestoreDirectory = true; // Restaurar el directorio al cerrar el diálogo
+                MessageBox.Show(archCalDetalles + " - " + archCalXOperario);
 
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+
+
+                if (string.IsNullOrEmpty(archCalDetalles) || string.IsNullOrEmpty(archCalXOperario) 
+                   // || string.IsNullOrEmpty(archReclDetalles)
+                    )
                 {
-                    // Obtener la ruta del archivo seleccionado
-                    string rutaArchivo = saveFileDialog1.FileName;
-
-                    // Aquí puedes realizar acciones adicionales, como guardar el archivo
-                    // Por ejemplo, guardar un archivo de texto
-                    // File.WriteAllText(rutaArchivo, contenido);
-
-                    // Mostrar un mensaje con la ruta seleccionada (opcional)
-                    GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion, rutaArchivo);
-                    MessageBox.Show($"Archivo guardado en: {rutaArchivo}", "Guardar archivo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LibroExcelHelper.MostrarMensaje("Error al cargarrrrrrrrr los archivos. Intente nuevamente.", true);
                 }
+                else
+                {
+                    string rutaArchivo = LibroExcelHelper.DialogoGuardarArchivo();
 
+                    if (string.IsNullOrEmpty(rutaArchivo))
+                    {
+                        LibroExcelHelper.MostrarMensaje("Tarea cancelada por el usuario.", true);
+                    }
+                    else
+                    {
+                        GenerarLibroCalidad(archCalDetalles, archCalXOperario, archReclDetalles, importeCertificacion, rutaArchivo);
+                    }
 
-
-
-
-
-
-
-              //  GenerarLibroCalidad(archivoAUtilizar, archivoCalXOper, importeCertificacion);
+                }
+            } catch (Exception e) {
+                LibroExcelHelper.MostrarMensaje(e.Message, true);
             }
+           
 
         }
 
-        private void GenerarLibroCalidad(string filePath, string pathCalXOper, double importeCertificacion, string rutaGuardar)
+
+
+        private void GenerarLibroCalidad(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion, string rutaGuardar)
         {
-            // Abrir y leer el archivo Excel con EPPlus
-            using (ExcelPackage excelPackageCalXOper = new ExcelPackage(new FileInfo(pathCalXOper)))
-            {
-                ExcelWorksheet hojaBaseCalXOp = excelPackageCalXOper.Workbook.Worksheets[0];
-                // Abrir y leer el archivo Excel con EPPlus
-                using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(filePath)))
-                {
-                    // Obtener la primera hoja de cálculo del archivo
-                    ExcelWorksheet hojaBase = excelPackage.Workbook.Worksheets[0];
+            using ExcelPackage libroCalXOperario = new(new FileInfo(rutaCalXOper));
+            ExcelWorksheet hojaBaseCalXOp = libroCalXOperario.Workbook.Worksheets[0];
 
-                    // Obtener el número total de filas y columnas en la hoja de cálculo
-                    int rowCount = hojaBase.Dimension.Rows;
-                    int colCount = hojaBase.Dimension.Columns;
+            using ExcelPackage libroReclDetalles = new(new FileInfo(rutaReclDetalles));
+            ExcelWorksheet hojaBaseReclDetalles = libroReclDetalles.Workbook.Worksheets[0];
 
-                    //crear rango para analizar
-                    //  var rangoCalidadDetalles = hojaBase.Cells[hojaBase.Dimension.Address];
+            using ExcelPackage libroCalDetalles = new(new FileInfo(rutaCalDetalles));
+            ExcelWorksheet hojaBaseCalDetalles = libroCalDetalles.Workbook.Worksheets[0];
 
-                    //creamos hojas nuevas del libro
-                    ExcelWorksheet hojaResumen = excelPackage.Workbook.Worksheets.Add("Resumen");
-                    ExcelWorksheet hojaResLecturista = excelPackage.Workbook.Worksheets.Add("Res-Lecturista");
-                    ExcelWorksheet hojaCantXOperario = excelPackage.Workbook.Worksheets.Add("Cant_x_Oper", hojaBaseCalXOp);
-                    ExcelWorksheet hojaCuadros = excelPackage.Workbook.Worksheets.Add("Cuadros");
-                    ExcelWorksheet hojaEliminados = excelPackage.Workbook.Worksheets.Add("ELIMINADOS");
+            // Obtener el número total de filas y columnas en la hoja de cálculo
+           // int rowCount = hojaBaseCalDetalles.Dimension.Rows;
+           // int colCount = hojaBaseCalDetalles.Dimension.Columns;
 
+            //crear rango para analizar
+            //  var rangoCalidadDetalles = hojaBase.Cells[hojaBase.Dimension.Address];
 
-                  
+            //creamos hojas nuevas del libro
+            ExcelWorksheet hojaResumen = libroCalDetalles.Workbook.Worksheets.Add("Resumen");
+            ExcelWorksheet hojaResLecturista = libroCalDetalles.Workbook.Worksheets.Add("Res-Lecturista");
+            ExcelWorksheet hojaCantXOperario = libroCalDetalles.Workbook.Worksheets.Add("Cant_x_Oper", hojaBaseCalXOp);
+            ExcelWorksheet hojaCuadros = libroCalDetalles.Workbook.Worksheets.Add("Cuadros");
+            ExcelWorksheet hojaEliminados = libroCalDetalles.Workbook.Worksheets.Add("ELIMINADOS");
 
-                    // libro2Package.Workbook.Worksheets.Add(sheet.Name, sheet);
+            // libro2Package.Workbook.Worksheets.Add(sheet.Name, sheet);
 
-                    //ubicacion de hojas
-                    excelPackage.Workbook.Worksheets.MoveBefore("Resumen", "calidad_detalle");
-                    excelPackage.Workbook.Worksheets.MoveBefore("Res-Lecturista", "calidad_detalle");
+            //ubicacion de hojas
+            libroCalDetalles.Workbook.Worksheets.MoveBefore("Resumen", "calidad_detalle");
+            libroCalDetalles.Workbook.Worksheets.MoveBefore("Res-Lecturista", "calidad_detalle");
 
 
-                    // Obtener el rango de celdas en la hoja copiada
-                    var rangoHojaCantXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
-                    LibroExcelHelper.ConvertirTextoANumero(rangoHojaCantXOperario);
+            // Obtener el rango de celdas en la hoja copiada
+            var rangoHojaCantXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
+            LibroExcelHelper.ConvertirTextoANumero(rangoHojaCantXOperario);
 
 
-                    // Obtener el rango de celdas en la hoja copiada
-                    /* var rangoCeldas = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
+            // Obtener el rango de celdas en la hoja copiada
+            /* var rangoCeldas = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
 
-                     // Convertir texto a número en el rango de celdas
-                     //  rangoCeldas.TextToNumber();
-                     foreach (var cell in rangoCeldas)
-                     {
-                         if (double.TryParse(cell.Value?.ToString(), out double valor))
-                         {
-                             // Asignar el valor convertido de vuelta a la celda
-                             cell.Value = valor;
-                         }
-                     }*/
+             // Convertir texto a número en el rango de celdas
+             //  rangoCeldas.TextToNumber();
+             foreach (var cell in rangoCeldas)
+             {
+                 if (double.TryParse(cell.Value?.ToString(), out double valor))
+                 {
+                     // Asignar el valor convertido de vuelta a la celda
+                     cell.Value = valor;
+                 }
+             }*/
 
 
 
 
-                    ////////////////
-                    ///
-                    /* var columnCells = hojaCantXOperario.Cells["E:E"];
+            ////////////////
+            ///
+            /* var columnCells = hojaCantXOperario.Cells["E:E"];
 
-                     // Iterar sobre las celdas de la columna y convertir los valores a números
-                     foreach (var cell in columnCells)
-                     {
-                         // Convertir el valor de la celda a número
-                         if (double.TryParse(cell.Value?.ToString(), out double valor))
-                         {
-                             // Hacer algo con el número convertido, por ejemplo, imprimirlo
-                             Console.WriteLine($"Valor convertido en la celda {cell.Address}: {valor}");
-                         }
-                         else
-                         {
-                             // Manejo de errores si no se puede convertir el valor a número
-                             Console.WriteLine($"El valor en la celda {cell.Address} no es un número válido.");
-                         }
-                     }*/
+             // Iterar sobre las celdas de la columna y convertir los valores a números
+             foreach (var cell in columnCells)
+             {
+                 // Convertir el valor de la celda a número
+                 if (double.TryParse(cell.Value?.ToString(), out double valor))
+                 {
+                     // Hacer algo con el número convertido, por ejemplo, imprimirlo
+                     Console.WriteLine($"Valor convertido en la celda {cell.Address}: {valor}");
+                 }
+                 else
+                 {
+                     // Manejo de errores si no se puede convertir el valor a número
+                     Console.WriteLine($"El valor en la celda {cell.Address} no es un número válido.");
+                 }
+             }*/
 
 
 
@@ -174,74 +157,70 @@ namespace MultasLectura.Controllers
 
 
 
-                    ////////////
+            ////////////
 
 
-                    //crear rango para analizar
-                    var rangoCalidadDetalles = hojaBase.Cells[hojaBase.Dimension.Address];
-                    var rangoCalXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
+            //crear rango para analizar
+            var rangoCalidadDetalles = hojaBaseCalDetalles.Cells[hojaBaseCalDetalles.Dimension.Address];
+            var rangoCalXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
 
-                    // hojaCantXOperario = excelPackageCalXOper.Workbook.Worksheets[0];
+            // hojaCantXOperario = excelPackageCalXOper.Workbook.Worksheets[0];
 
-                    AgregarContenidoHojaResumen(hojaBase, hojaResumen, rangoCalidadDetalles, _baremos, _metas, hojaBaseCalXOp, importeCertificacion);
+            AgregarContenidoHojaResumen(hojaBaseCalDetalles, hojaResumen, rangoCalidadDetalles, _baremos, _metas, hojaBaseCalXOp, importeCertificacion);
 
-                    AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
-                    AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBase, hojaResLecturista);
-                    /* AgregarContenidoHojaResLecturista();
-                     AgregarContenidoHojaCantXOperario();
-                     AgregarContenidoHojaCuadros();*/
-
-
-                    /*  CrearTablaDinTipoEstado(hojaResumen, rangoTablaDinamica);
-
-                      CrearTablaMetodoLineal(hojaResumen, hojaBase);
-
-                      CrearTablaTotales(hojaResumen);
-
-                      CrearTablaValorFinalMulta(hojaResumen);
-
-                      CrearTablaBaremosMetas(hojaResumen);*/
+            AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
+            AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBaseCalDetalles, hojaResLecturista);
+            /* AgregarContenidoHojaResLecturista();
+             AgregarContenidoHojaCantXOperario();
+             AgregarContenidoHojaCuadros();*/
 
 
-                    //  multa.CantidadT1 = 345;
-                    //   multa.CalcularImporteT1(baremos.T1);
+            /*  CrearTablaDinTipoEstado(hojaResumen, rangoTablaDinamica);
 
-                    //  label1.Text = multa.ImporteT1.ToString();
+              CrearTablaMetodoLineal(hojaResumen, hojaBase);
 
+              CrearTablaTotales(hojaResumen);
 
-                    /*  var tabla = hojaResumen.Tables["TablaDinTipoEstado"];
-                      //var pivotTable = hojaResumen.PivotTables["TablaDinTipoEstado"];
-                      var pivotTable = hojaResumen.PivotTables.FirstOrDefault(pt => pt.Name == "TablaDinTipoEstado");
+              CrearTablaValorFinalMulta(hojaResumen);
 
-                      // var rangofinal = pivotTable.TableRange;
-
-                      //var rangoTabla = tabla.Address;
-
-                      /*int startRow = rangoTabla.Start.Row;
-                      int startColumn = rangoTabla.Start.Column;
-                      int endRow = rangoTabla.End.Row;
-                      int endColumn = rangoTabla.End.Column;*/
-
-                    /*  var startRow = pivotTable.RowFields;
+              CrearTablaBaremosMetas(hojaResumen);*/
 
 
-                    /*  int startColumn = rangoTabla.Start.Column;
-                      int endRow = rangoTabla.End.Row;
-                      int endColumn = rangoTabla.End.Column;*/
+            //  multa.CantidadT1 = 345;
+            //   multa.CalcularImporteT1(baremos.T1);
 
-                    //  MessageBox.Show(startRow + " - columna= " );
+            //  label1.Text = multa.ImporteT1.ToString();
 
 
+            /*  var tabla = hojaResumen.Tables["TablaDinTipoEstado"];
+              //var pivotTable = hojaResumen.PivotTables["TablaDinTipoEstado"];
+              var pivotTable = hojaResumen.PivotTables.FirstOrDefault(pt => pt.Name == "TablaDinTipoEstado");
+
+              // var rangofinal = pivotTable.TableRange;
+
+              //var rangoTabla = tabla.Address;
+
+              /*int startRow = rangoTabla.Start.Row;
+              int startColumn = rangoTabla.Start.Column;
+              int endRow = rangoTabla.End.Row;
+              int endColumn = rangoTabla.End.Column;*/
+
+            /*  var startRow = pivotTable.RowFields;
+
+
+            /*  int startColumn = rangoTabla.Start.Column;
+              int endRow = rangoTabla.End.Row;
+              int endColumn = rangoTabla.End.Column;*/
+
+            //  MessageBox.Show(startRow + " - columna= " );
 
 
 
-                    // Guardar archivo
-                    //  excelPackage.SaveAs(new FileInfo(@"C:/Users/maxio/Documents/archivo3.xlsx"));
-                    excelPackage.SaveAs(new FileInfo(rutaGuardar));
 
 
-                }
-            }
+            // Guardar archivo
+            //  excelPackage.SaveAs(new FileInfo(@"C:/Users/maxio/Documents/archivo3.xlsx"));
+            libroCalDetalles.SaveAs(new FileInfo(rutaGuardar));
 
         }
 

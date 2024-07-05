@@ -148,7 +148,12 @@ namespace MultasLectura.Helpers
                         }
                     }
 
-                    pathGuardarConversion += "libro-conversion.xlsx";
+                    Random random = new Random();
+
+                    // Generar un número aleatorio entre 1 y 100 (ambos inclusive)
+                    int numeroAleatorio = random.Next(1, 101);
+
+                    pathGuardarConversion += $"libro-conversion{numeroAleatorio}.xlsx";
 
                     //  MessageBox.Show(partesPath[partesPath.Length - 1]);
 
@@ -218,6 +223,25 @@ namespace MultasLectura.Helpers
                     celda.Value = valor;
                 }
             }
+        }
+
+        static public string DialogoGuardarArchivo()
+        {
+            string rutaArchivo = string.Empty;
+
+            SaveFileDialog guardar = new SaveFileDialog();
+            guardar.Filter = "Archivos Excel (*.xlsx)|*.xlsx";
+            guardar.FilterIndex = 1;
+            guardar.RestoreDirectory = true;
+
+            guardar.FileName = "+ Calidad_Lectura.xlsx";
+
+            if (guardar.ShowDialog() == DialogResult.OK)
+            {
+                rutaArchivo = guardar.FileName;
+            }
+
+            return rutaArchivo;
         }
 
         static public void MostrarMensaje(string mensaje, bool esError)
