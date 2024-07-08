@@ -61,11 +61,14 @@
             // 
             // txtRutaCalidadDetalles
             // 
+            txtRutaCalidadDetalles.AllowDrop = true;
             txtRutaCalidadDetalles.Location = new Point(6, 43);
             txtRutaCalidadDetalles.Name = "txtRutaCalidadDetalles";
             txtRutaCalidadDetalles.ReadOnly = true;
             txtRutaCalidadDetalles.Size = new Size(364, 29);
             txtRutaCalidadDetalles.TabIndex = 0;
+            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop;
+            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter;
             // 
             // btnCalidadDetalles
             // 

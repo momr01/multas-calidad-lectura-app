@@ -39,6 +39,21 @@ namespace MultasLectura
             // _cargarLibroExcelFuncion = _calidadController.CargarLibroExcel;
             loaderForm = new Loader();
 
+            txtRutaCalidadDetalles.AllowDrop = true;
+            txtRutaCalXOperarios.AllowDrop = true;
+            txtRutaReclamosDetalles.AllowDrop = true;
+
+            // Asignar eventos DragEnter y DragDrop
+            // txtRutaCalidadDetalles.DragEnter += new DragEventHandler(txtRutaCalidadDetalles_DragEnter);
+            //txtRutaCalidadDetalles.DragDrop += new DragEventHandler(txtRutaCalidadDetalles_DragDrop);
+            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter;
+            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop;
+            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter;
+            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop;
+            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter;
+            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop;
+
+
         }
 
 
@@ -256,41 +271,161 @@ namespace MultasLectura
 
         private void btnGenerarLibroFinal_Click(object sender, EventArgs e)
         {
-          /*  MostrarLoader();
-           
-            Task.Run(() =>
-            {*/
-               
+            /*  MostrarLoader();
 
-                if (string.IsNullOrEmpty(txtRutaCalidadDetalles.Text) || string.IsNullOrEmpty(txtRutaCalXOperarios.Text) 
-              //  || string.IsNullOrEmpty(txtRutaReclamosDetalles.Text)
-                )
+              Task.Run(() =>
+              {*/
+
+            //  MessageBox.Show(txtRutaCalidadDetalles.Lines.FirstOrDefault().ToString());
+
+            string rutaCalDetalles =  txtRutaCalidadDetalles.Lines.FirstOrDefault();
+            string rutaCalXOperario = txtRutaCalXOperarios.Lines.FirstOrDefault();
+            string rutaReclDetalles = txtRutaReclamosDetalles.Lines.FirstOrDefault();
+
+
+            if (string.IsNullOrEmpty(rutaCalDetalles) || string.IsNullOrEmpty(rutaCalXOperario) || string.IsNullOrEmpty(rutaReclDetalles)
+            )
+            {
+                LibroExcelHelper.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
+            }
+            else
+            {
+                if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
                 {
-                    LibroExcelHelper.MostrarMensaje("Debe cargar todos los archivos solicitados.", true);
+                    _calidadController.CargarLibroExcel(rutaCalDetalles, rutaCalXOperario, rutaReclDetalles, importeCertificacion);
                 }
                 else
                 {
-                    if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
-                    {
-                        _calidadController.CargarLibroExcel(txtRutaCalidadDetalles.Text, txtRutaCalXOperarios.Text, txtRutaReclamosDetalles.Text, importeCertificacion);
-                    }
-                    else
-                    {
-                        LibroExcelHelper.MostrarMensaje("Por favor ingrese un importe de certificación válido.", true);
-                    }
-
+                    LibroExcelHelper.MostrarMensaje("Por favor ingrese un importe de certificación válido.", true);
                 }
 
-               
-              /*  this.Invoke((MethodInvoker)delegate
+            }
+
+
+            /*  this.Invoke((MethodInvoker)delegate
+              {
+                  OcultarLoader();
+
+              });
+          });*/
+
+
+
+        }
+
+        private void txtRutaCalidadDetalles_DragDrop(object sender, DragEventArgs e)
+        {
+            /*    if (e.Data.GetDataPresent(DataFormats.Text))
                 {
-                    OcultarLoader();
-                  
-                });
-            });*/
+                    string texto = e.Data.GetData(DataFormats.Text).ToString();
+                    txtRutaCalidadDetalles.Text = texto;
+                }*/
 
 
+            /* if (e.Data.GetDataPresent(DataFormats.FileDrop))
+             {
+
+                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                 foreach (string file in files)
+                 {
+                     txtRutaCalidadDetalles.AppendText(file + Environment.NewLine);
+                 }
+
+
+
+           }*/
+
+            /*  if (e.Data.GetDataPresent(DataFormats.Text))
+              {
+                  string texto = (string)e.Data.GetData(DataFormats.Text);
+                  txtRutaCalidadDetalles.Text = texto;
+              }*/
+
+            AgregarRutaATextBox(e, txtRutaCalidadDetalles);
+        }
+
+        private void txtRutaCalXOperarios_DragDrop(object sender, DragEventArgs e)
+        {
+            AgregarRutaATextBox(e, txtRutaCalXOperarios);
+        }
+
+        private void txtRutaReclamosDetalles_DragDrop(object sender, DragEventArgs e)
+        {
+           
+
+            AgregarRutaATextBox(e, txtRutaReclamosDetalles);
+        }
+
+        private void AgregarRutaATextBox(DragEventArgs e, System.Windows.Forms.TextBox txt)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string file in files)
+                {
+                    txt.AppendText(file + Environment.NewLine);
+                }
+
+
+
+            }
+        }
+
+        private void EventoDragEnter(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void txtRutaCalidadDetalles_DragEnter(object sender, DragEventArgs e)
+        {
+            EventoDragEnter(e);
+            /* if (e.Data.GetDataPresent(DataFormats.FileDrop))
+              {
+                  e.Effect = DragDropEffects.Copy;
+              }
+              else
+              {
+                  e.Effect = DragDropEffects.None;
+              }*/
+
+         /*   if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }*/
+
+
+            /*  if (e.Data.GetDataPresent(DataFormats.Text))
+              {
+                  e.Effect = DragDropEffects.Copy;
+              }
+              else
+              {
+                  e.Effect = DragDropEffects.None;
+              }*/
+        }
+
+        private void txtRutaCalXOperarios_DragEnter(object sender, DragEventArgs e)
+        {
+            EventoDragEnter(e);
             
+        }
+
+        private void txtRutaReclamosDetalles_DragEnter(object sender, DragEventArgs e)
+        {
+            EventoDragEnter(e);
+
         }
     }
 }

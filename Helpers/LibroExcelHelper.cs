@@ -71,6 +71,20 @@ namespace MultasLectura.Helpers
             rango.Style.Fill.BackgroundColor.SetColor(color);
         }
 
+        static public int ObtenerNumeroColumna(ExcelWorksheet hoja, string encabezado)
+        {
+            int contadorColumnas = hoja.Dimension.End.Column;
+            for (int col = 1; col <= contadorColumnas; col++)
+            {
+                if (hoja.Cells[1, col].Text == encabezado)
+                {
+                    return col;
+                }
+            }
+            return -1;
+        }
+
+
         static public string ValidarFormato(string filePath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -83,6 +97,7 @@ namespace MultasLectura.Helpers
             }
             else if (fileExtension.ToLower() == ".xls")
             {
+                
                 string convertedFilePath = ConvertirXlsAXlsx(filePath);
                 if (!string.IsNullOrEmpty(convertedFilePath))
                 {
@@ -101,6 +116,7 @@ namespace MultasLectura.Helpers
 
         static private string ConvertirXlsAXlsx(string xlsFilePath)
         {
+           
             try
             {
 
@@ -109,6 +125,7 @@ namespace MultasLectura.Helpers
                 {
                     HSSFWorkbook hssfwb = new HSSFWorkbook(fs); // Crear instancia de libro .xls
                     XSSFWorkbook workbook = new XSSFWorkbook(); // Crear instancia de libro .xlsx
+
 
                     // Copiar hojas de .xls a .xlsx
                     for (int i = 0; i < hssfwb.NumberOfSheets; i++)
@@ -148,12 +165,16 @@ namespace MultasLectura.Helpers
                         }
                     }
 
-                    Random random = new Random();
+                    string nombreOriginal = Path.GetFileNameWithoutExtension(xlsFilePath);
+
+                    //   Random random = new Random();
 
                     // Generar un número aleatorio entre 1 y 100 (ambos inclusive)
-                    int numeroAleatorio = random.Next(1, 101);
+                    //  int numeroAleatorio = random.Next(1, 101);
 
-                    pathGuardarConversion += $"libro-conversion{numeroAleatorio}.xlsx";
+                    //  pathGuardarConversion += $"libro-conversion{numeroAleatorio}.xlsx";
+                   // DateTime.Now.ToString("yyyyMMdd") + "-" + DateTime.Now.ToString("HHmmss")
+                    pathGuardarConversion += $"{nombreOriginal}_{DateTime.Now.ToString("yyyyMMdd")}{DateTime.Now.ToString("HHmmss")}.xlsx";
 
                     //  MessageBox.Show(partesPath[partesPath.Length - 1]);
 
