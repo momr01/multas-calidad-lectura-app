@@ -84,11 +84,11 @@ namespace MultasLectura.Controllers
                 if (cellValue != null)
                 {
 
-                    if (cellValue.ToString().ToLower().Contains("t1"))
+                    if (cellValue.ToString()!.ToLower().Contains("t1"))
                     {
                         totalReclT1++;
                     }
-                    else if (cellValue.ToString().ToLower().Contains("t2"))
+                    else if (cellValue.ToString()!.ToLower().Contains("t2"))
                     {
                         totalReclT2++;
                     }
@@ -116,7 +116,6 @@ namespace MultasLectura.Controllers
             using ExcelPackage libroCalDetalles = new(new FileInfo(rutaCalDetalles));
             ExcelWorksheet hojaBaseCalDetalles = libroCalDetalles.Workbook.Worksheets[0];
 
-
             //creamos hojas nuevas del libro
             ExcelWorksheet hojaResumen = libroCalDetalles.Workbook.Worksheets.Add("Resumen");
             ExcelWorksheet hojaResLecturista = libroCalDetalles.Workbook.Worksheets.Add("Res-Lecturista");
@@ -124,54 +123,37 @@ namespace MultasLectura.Controllers
             ExcelWorksheet hojaCuadros = libroCalDetalles.Workbook.Worksheets.Add("Cuadros");
             ExcelWorksheet hojaEliminados = libroCalDetalles.Workbook.Worksheets.Add("ELIMINADOS");
 
-
             //ubicacion de hojas
             libroCalDetalles.Workbook.Worksheets.MoveBefore("Resumen", "calidad_detalle");
             libroCalDetalles.Workbook.Worksheets.MoveBefore("Res-Lecturista", "calidad_detalle");
 
 
-            // Obtener el rango de celdas en la hoja copiada
+            //Obtener rangos de las hojas que utilizaremos
             var rangoHojaCantXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
+            var rangoCalidadDetalles = hojaBaseCalDetalles.Cells[hojaBaseCalDetalles.Dimension.Address];
+            var rangoCalXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
+
+            //Convertir a número la columna de la hoja cal x operario
             LibroExcelHelper.ConvertirTextoANumero(rangoHojaCantXOperario);
 
-
-          //  int rowCount = hojaBaseReclDetalles.Dimension.Rows;
-          //   int colCount = hojaBaseReclDetalles.Dimension.Columns;
-
-          //  int totalReclT1 = 0;
-          //  int totalReclT2 = 0;
-
-            // Llama a la función para obtener el número de columna
-            // int columnNumber = GetColumnNumberByHeader(filePath, headerName);
+            Dictionary<string, int> reclamosValores = new();
+            
             int numeroColumna = LibroExcelHelper.ObtenerNumeroColumna(hojaBaseReclDetalles, "desc_tar");
-
-            Dictionary<string, int> reclamosValores = new Dictionary<string, int>();
-
             if (numeroColumna != -1)
             {
-                //Console.WriteLine($"El encabezado '{headerName}' se encuentra en la columna número {columnNumber}.");
-                // MessageBox.Show("numero de columna: " + columnNumber);
                 reclamosValores = ReclamosPorTarifa(hojaBaseReclDetalles, numeroColumna);
             }
             else
             {
-                //Console.WriteLine($"El encabezado '{headerName}' no se encontró.");
-                // MessageBox.Show("NO EXISTE LA COLUMNA");
                 throw new Exception();
             }
-
-
-            //crear rango para analizar
-            var rangoCalidadDetalles = hojaBaseCalDetalles.Cells[hojaBaseCalDetalles.Dimension.Address];
-            var rangoCalXOperario = hojaCantXOperario.Cells[hojaCantXOperario.Dimension.Address];
-
        
-
+            //Agregar contenido
             AgregarContenidoHojaResumen(hojaBaseCalDetalles, hojaResumen, rangoCalidadDetalles, _baremos, _metas, hojaBaseCalXOp, importeCertificacion, reclamosValores);
-
             AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
             AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBaseCalDetalles, hojaResLecturista);
             
+            //guardar libro calidad
             libroCalDetalles.SaveAs(new FileInfo(rutaGuardar));
 
         }

@@ -24,11 +24,10 @@ namespace MultasLectura
     public partial class GenerarLibroCalidad : Form
     {
         private readonly ILibroCalidadController _calidadController;
-        // private readonly Action<string> _cargarLibroExcelFuncion;
         private readonly BaremoModel _baremos = new BaremoModel();
         private readonly MetaModel _metas = new MetaModel();
 
-        private Loader loaderForm;
+        private Loader _loaderForm;
 
         public GenerarLibroCalidad()
         {
@@ -36,185 +35,26 @@ namespace MultasLectura
             ArchivoTextoHelper.VerificarExisteArchivoBaremos(_baremos);
             ArchivoTextoHelper.VerificarExisteArchivoMetas(_metas);
             _calidadController = new LibroCalidadController(_baremos!, _metas!);
-            // _cargarLibroExcelFuncion = _calidadController.CargarLibroExcel;
-            loaderForm = new Loader();
+            _loaderForm = new Loader();
+            DragDropTextBoxes();
 
+
+
+        }
+
+        private void DragDropTextBoxes()
+        {
             txtRutaCalidadDetalles.AllowDrop = true;
             txtRutaCalXOperarios.AllowDrop = true;
             txtRutaReclamosDetalles.AllowDrop = true;
 
-            // Asignar eventos DragEnter y DragDrop
-            // txtRutaCalidadDetalles.DragEnter += new DragEventHandler(txtRutaCalidadDetalles_DragEnter);
-            //txtRutaCalidadDetalles.DragDrop += new DragEventHandler(txtRutaCalidadDetalles_DragDrop);
-            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter;
-            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop;
-            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter;
-            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop;
-            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter;
-            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop;
-
-
+            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter!;
+            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop!;
+            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter!;
+            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop!;
+            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter!;
+            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop!;
         }
-
-
-        private void btnCalidadDetalles_Click(object sender, EventArgs e)
-        {
-            // LibroExcelModel.IniciarProcesoCarga(txtRutaCalidadDetalles, _cargarLibroExcelFuncion);
-            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalidadDetalles);
-        }
-
-        private void btnReclamosDetalles_Click(object sender, EventArgs e)
-        {
-            //  LibroExcelModel.IniciarProcesoCarga(txtRutaReclamosDetalles, _cargarLibroExcelFuncion);
-            LibroExcelHelper.IniciarProcesoCarga(txtRutaReclamosDetalles);
-            /* string filePath = LibroExcelModel.CargarLibroExcel();
-
-             if (string.IsNullOrEmpty(filePath))
-             {
-                 txtRutaReclamosDetalles.Text = string.Empty;
-                 LibroExcelModel.MostrarMensaje("Ocurrió un error al intentar cargar el archivo. Por favor inténtelo nuevamente", true);
-             }
-             else
-             {
-                 txtRutaReclamosDetalles.Text = filePath;
-             }*/
-        }
-
-        private void btnCalXOperarios_Click(object sender, EventArgs e)
-        {
-            // LibroExcelModel.IniciarProcesoCarga(txtRutaCalXOperarios, _cargarLibroExcelFuncion);
-            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalXOperarios);
-            /* string filePath = LibroExcelModel.CargarLibroExcel();
-
-             if (string.IsNullOrEmpty(filePath))
-             {
-                 txtRutaCalXOperarios.Text = string.Empty;
-                 LibroExcelModel.MostrarMensaje("Ocurrió un error al intentar cargar el archivo. Por favor inténtelo nuevamente", true);
-             }
-             else
-             {
-                 txtRutaCalXOperarios.Text = filePath;
-             }*/
-        }
-
-        /*
-        private void CrearArchivoBaremos(string filePath)
-        {
-            using (StreamWriter writer = new StreamWriter(filePath))
-            {
-                writer.WriteLine("t1;0");
-                writer.WriteLine("t2;0");
-                writer.WriteLine("t3;0");
-                writer.WriteLine("alturat1;0");
-                writer.WriteLine("alturat3;0");
-            }
-        }
-
-        private void CrearArchivoMetas(string filePath)
-        {
-            using (StreamWriter writer = new StreamWriter(filePath))
-            {
-                writer.WriteLine("meta1;0");
-                writer.WriteLine("meta2;0");
-            }
-        }
-        */
-
-        /*
-        private void LeerArchivoBaremos(string filePath)
-        {
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    string linea;
-
-                    while ((linea = reader.ReadLine()) != null)
-                    {
-                        var arregloLinea = linea.Split(';');
-                    switch(arregloLinea[0])
-                    {
-                        case "t1":
-                            _baremos.T1 = double.Parse(arregloLinea[1]);
-                            break;
-                        case "t2":
-                            _baremos.T2 = double.Parse(arregloLinea[1]);
-                            break;
-                        case "t3":
-                            _baremos.T3 = double.Parse(arregloLinea[1]);
-                            break;
-                        case "alturat1":
-                            _baremos.AlturaT1 = double.Parse(arregloLinea[1]);
-                            break;
-                        case "alturat3":
-                            _baremos.AlturaT3 = double.Parse(arregloLinea[1]);
-                            break;
-
-                    }
-                    }
-                }
-           
-        }
-        */
-
-        /* private void LeerArchivoMetas(string filePath)
-         {
-             using (StreamReader reader = new StreamReader(filePath))
-             {
-                 string linea;
-
-                 while ((linea = reader.ReadLine()) != null)
-                 {
-                     var arregloLinea = linea.Split(';');
-                     switch (arregloLinea[0])
-                     {
-                         case "meta1":
-                             _metas.Meta1 = double.Parse(arregloLinea[1]);
-                             break;
-                         case "meta2":
-                             _metas.Meta2 = double.Parse(arregloLinea[1]);
-                             break;
-
-                     }
-                 }
-             }
-
-         }*/
-
-        /*
-
-        private void VerificarExisteArchivoBaremos()
-        {
-            string pathProyecto = AppDomain.CurrentDomain.BaseDirectory;
-            string filePath = Path.Combine(pathProyecto, "baremos.txt");
-
-            if (File.Exists(filePath))
-            {
-                // LeerArchivoBaremos(filePath);
-                ArchivoTextoModel.LeerArchivoBaremos(filePath, _baremos);
-            }
-            else
-            {
-                CrearArchivoBaremos(filePath);
-                // LeerArchivoBaremos(filePath);
-                ArchivoTextoModel.LeerArchivoBaremos(filePath, _baremos);
-            }
-        }
-
-        private void VerificarExisteArchivoMetas()
-        {
-            string pathProyecto = AppDomain.CurrentDomain.BaseDirectory;
-            string filePath = Path.Combine(pathProyecto, "metas.txt");
-
-            if (File.Exists(filePath))
-            {
-                LeerArchivoMetas(filePath);
-            }
-            else
-            {
-                CrearArchivoMetas(filePath);
-                LeerArchivoMetas(filePath);
-            }
-        }
-        */
 
         private void CargarDatosBaremos()
         {
@@ -233,40 +73,37 @@ namespace MultasLectura
 
         }
 
+        private void btnCalidadDetalles_Click(object sender, EventArgs e)
+        {
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalidadDetalles);
+        }
+
+        private void btnReclamosDetalles_Click(object sender, EventArgs e)
+        {
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaReclamosDetalles);
+        }
+
+        private void btnCalXOperarios_Click(object sender, EventArgs e)
+        {
+            LibroExcelHelper.IniciarProcesoCarga(txtRutaCalXOperarios);
+        }
+
+
         private void GenerarLibroCalidad_Load(object sender, EventArgs e)
         {
             CargarDatosBaremos();
             CargarDatosMetas();
-
-
-        }
-
-        private void addControls(UserControl uc)
-        {
-            // panelContainer.Controls.Clear();
-            //  uc.Dock = DockStyle.Fill;
-            // panelContainer.Controls.Add(uc);
-            //  panel3.Controls.Add(uc);
-            //  uc.BringToFront();
         }
 
         private void MostrarLoader()
         {
-            // pictureBox1.Visible = true;
-            // Aquí puedes iniciar tu tarea larga
-            //  UC_Loader loader = new UC_Loader();
-            // addControls(loader);
-            loaderForm.StartPosition = FormStartPosition.CenterParent; // Aparece centrado respecto al formulario principal
-            loaderForm.Show(this);
+            _loaderForm.StartPosition = FormStartPosition.CenterParent; // Aparece centrado respecto al formulario principal
+            _loaderForm.Show(this);
         }
 
         private void OcultarLoader()
         {
-            //  pictureBox1.Visible = false;
-            // Aquí puedes finalizar tu tarea larga
-            // UC_Loader loader = new UC_Loader();
-            // addControls(loader);
-            loaderForm.Hide();
+            _loaderForm.Hide();
         }
 
         private void btnGenerarLibroFinal_Click(object sender, EventArgs e)
@@ -278,7 +115,7 @@ namespace MultasLectura
 
             //  MessageBox.Show(txtRutaCalidadDetalles.Lines.FirstOrDefault().ToString());
 
-            string rutaCalDetalles =  txtRutaCalidadDetalles.Lines.FirstOrDefault();
+            string rutaCalDetalles = txtRutaCalidadDetalles.Lines.FirstOrDefault();
             string rutaCalXOperario = txtRutaCalXOperarios.Lines.FirstOrDefault();
             string rutaReclDetalles = txtRutaReclamosDetalles.Lines.FirstOrDefault();
 
@@ -315,32 +152,6 @@ namespace MultasLectura
 
         private void txtRutaCalidadDetalles_DragDrop(object sender, DragEventArgs e)
         {
-            /*    if (e.Data.GetDataPresent(DataFormats.Text))
-                {
-                    string texto = e.Data.GetData(DataFormats.Text).ToString();
-                    txtRutaCalidadDetalles.Text = texto;
-                }*/
-
-
-            /* if (e.Data.GetDataPresent(DataFormats.FileDrop))
-             {
-
-                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                 foreach (string file in files)
-                 {
-                     txtRutaCalidadDetalles.AppendText(file + Environment.NewLine);
-                 }
-
-
-
-           }*/
-
-            /*  if (e.Data.GetDataPresent(DataFormats.Text))
-              {
-                  string texto = (string)e.Data.GetData(DataFormats.Text);
-                  txtRutaCalidadDetalles.Text = texto;
-              }*/
-
             AgregarRutaATextBox(e, txtRutaCalidadDetalles);
         }
 
@@ -351,8 +162,6 @@ namespace MultasLectura
 
         private void txtRutaReclamosDetalles_DragDrop(object sender, DragEventArgs e)
         {
-           
-
             AgregarRutaATextBox(e, txtRutaReclamosDetalles);
         }
 
@@ -387,39 +196,12 @@ namespace MultasLectura
         private void txtRutaCalidadDetalles_DragEnter(object sender, DragEventArgs e)
         {
             EventoDragEnter(e);
-            /* if (e.Data.GetDataPresent(DataFormats.FileDrop))
-              {
-                  e.Effect = DragDropEffects.Copy;
-              }
-              else
-              {
-                  e.Effect = DragDropEffects.None;
-              }*/
-
-         /*   if (e.Data.GetDataPresent(DataFormats.Text))
-            {
-                e.Effect = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-            }*/
-
-
-            /*  if (e.Data.GetDataPresent(DataFormats.Text))
-              {
-                  e.Effect = DragDropEffects.Copy;
-              }
-              else
-              {
-                  e.Effect = DragDropEffects.None;
-              }*/
         }
 
         private void txtRutaCalXOperarios_DragEnter(object sender, DragEventArgs e)
         {
             EventoDragEnter(e);
-            
+
         }
 
         private void txtRutaReclamosDetalles_DragEnter(object sender, DragEventArgs e)

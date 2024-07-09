@@ -71,6 +71,7 @@
             generarArchivoPlazosToolStripMenuItem.Name = "generarArchivoPlazosToolStripMenuItem";
             generarArchivoPlazosToolStripMenuItem.Size = new Size(213, 22);
             generarArchivoPlazosToolStripMenuItem.Text = "Generar Archivo Plazos";
+            generarArchivoPlazosToolStripMenuItem.Click += generarArchivoPlazosToolStripMenuItem_Click;
             // 
             // generarArchivoResumenToolStripMenuItem
             // 

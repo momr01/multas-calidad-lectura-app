@@ -30,6 +30,9 @@ namespace MultasLectura.Views.Controllers
                     case "GenerarLibroCalidad":
                         formularioNuevo = new GenerarLibroCalidad();
                         break;
+                    case "GenerarLibroPlazos":
+                        formularioNuevo = new GenerarLibroPlazos();
+                        break;
                     default:
                         break;
                 }

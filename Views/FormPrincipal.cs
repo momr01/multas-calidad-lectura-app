@@ -65,5 +65,11 @@ namespace MultasLectura.Views
             // AbrirFormularioSecundario("GenerarLibroCalidad");
             _controller.AbrirFormularioSecundario("GenerarLibroCalidad", formulariosAbiertos, this);
         }
+
+        private void generarArchivoPlazosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+           _controller.AbrirFormularioSecundario("GenerarLibroPlazos", formulariosAbiertos, this);
+        }
     }
 }

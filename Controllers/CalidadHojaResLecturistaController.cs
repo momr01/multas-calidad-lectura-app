@@ -38,22 +38,6 @@ namespace MultasLectura.Controllers
             this.Inconformidades = Inconformidades;
         }
 
-
-
-
-
-
-        /*   public int CantidadT1 { get { return cantidadT1; } set { cantidadT1 = value; } }
-           public int CantidadT2 { get { return cantidadT2; } set { cantidadT2 = value; } }
-           public int CantidadT3 { get { return cantidadT3; } set { cantidadT3 = value; } }
-           public int CantidadAlturaT1 { get { return cantidadAlturaT1; } set { cantidadAlturaT1 = value; } }
-           public int CantidadAlturaT3 { get { return cantidadAlturaT3; } set { cantidadAlturaT3 = value; } }
-           public double ImporteT1 { get { return importeT1; } set { importeT1 = value; } }
-
-           public void CalcularImporteT1(double baremo)
-           {
-               importeT1 = 2 * cantidadT1 * baremo;
-           }*/
     }
 
 

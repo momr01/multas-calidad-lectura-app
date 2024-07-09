@@ -114,6 +114,7 @@
             txtImporteCertificacion.Size = new Size(318, 29);
             txtImporteCertificacion.TabIndex = 7;
             txtImporteCertificacion.Text = "105147160,4";
+            txtImporteCertificacion.TextAlign = HorizontalAlignment.Right;
             // 
             // label3
             // 
