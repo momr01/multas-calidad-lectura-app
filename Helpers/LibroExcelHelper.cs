@@ -31,6 +31,16 @@ namespace MultasLectura.Helpers
             }
         }
 
+        static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, Color color)
+        {
+            hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+           // hoja.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 199, 206));
+        //    hoja.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 0, 6));
+
+          //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+          //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
+        }
+
         static public void AplicarBordeFinoARango(ExcelRangeBase rango)
         {
             rango.Style.Border.Top.Style = ExcelBorderStyle.Thin;

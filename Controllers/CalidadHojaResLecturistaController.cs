@@ -39,14 +39,11 @@ namespace MultasLectura.Controllers
             }
         }
 
-        private void CrearDiccionarioEmpleados(ExcelWorksheet hoja)
+        private List<EmpleadoModel> CrearListaEmpleados(ExcelWorksheet hoja)
         {
             int contFilas = hoja.Dimension.Rows;
-           // int contColumnas = hoja.Dimension.Columns;
-
-
+          
             List<EmpleadoModel> empleados = new();
-            //  int numPrimeraCelda = 2;
 
             int colEmpleado = LibroExcelHelper.ObtenerNumeroColumna(hoja, "empleado");
             int colValores = LibroExcelHelper.ObtenerNumeroColumna(hoja, "compute_0005");
@@ -55,123 +52,85 @@ namespace MultasLectura.Controllers
             {
                 for (int fila = 1; fila <= contFilas; fila++)
                 {
-                   // for (int col = 1; col <= contColumnas; col++)
-                   // {
                         object cellValue = hoja.Cells[fila, colEmpleado].Value;
                         if (cellValue != null)
                         {
-                            if (cellValue.ToString()!.Contains("SYMESA"))
+                            if (cellValue.ToString()!.ToLower().Contains("symesa"))
                             {
                                 bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()!));
 
                                 if (!contieneTexto)
                                 {
-                                    empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: int.Parse(hoja.Cells[fila, colValores].Value.ToString()), Inconformidades: 0));
+                                EmpleadoModel nuevoEmpleado = new(
+                                    Nombre: cellValue.ToString()!,
+                                    Leidos: int.Parse(hoja.Cells[fila, colValores].Value.ToString()!),
+                                    Inconformidades: 0
+                                );
+                                
+                                    empleados.Add(nuevoEmpleado);
                                 }
                                 else
                                 {
-                                    empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString())).FirstOrDefault().Leidos += int.Parse(hoja.Cells[fila, colValores].Value.ToString());
+                                EmpleadoModel emplExistente = empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString()!)).FirstOrDefault()!;
+                                emplExistente.Leidos += int.Parse(hoja.Cells[fila, colValores].Value.ToString()!);
                                 }
 
 
                             }
                         }
-                    //}
                 }
-
             }
 
+            return empleados;
+        }
 
-            
+        private void CalcularInconformidades(ExcelWorksheet hoja, 
+          ref List<EmpleadoModel> empleados, 
+          ref int totalInconformidades)
+        {
+
+            int contFilas = hoja.Dimension.Rows;
+            int contColumnas = hoja.Dimension.Columns;
+            int colEmpleado = LibroExcelHelper.ObtenerNumeroColumna(hoja, "lector");
+
+            if (colEmpleado != -1)
+            {
+                for (int row = 1; row <= contFilas; row++)
+                {
+                    object cellValue = hoja.Cells[row, colEmpleado].Value;
+                    if (cellValue != null)
+                    {
+                        if (cellValue.ToString()!.ToLower().Contains("symesa"))
+                        {
+                            totalInconformidades++;
+                            bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()!));
+
+                            if (!contieneTexto)
+                            {
+                                EmpleadoModel nuevoEmpleado = new(
+                                    Nombre: cellValue.ToString()!,
+                                    Leidos: 0,
+                                    Inconformidades: 1
+                                );
+
+                                empleados.Add(nuevoEmpleado);
+                            }
+                            else
+                            {
+                                EmpleadoModel empleadoExistente = empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString()!)).FirstOrDefault()!;
+                                empleadoExistente.Inconformidades += 1;
+                            }
+
+
+                        }
+                    }
+                }
+            }
 
         }
 
-        public void CrearTablaLecturistaInconformidades(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino)
+      private void CalcularProporcionIdealLeidos(ref List<EmpleadoModel> empleados, ref double totalIdeal, ref int totalLeidos)
         {
-            CrearEncabezados(hojaDestino);
-
-            CrearDiccionarioEmpleados(hojaCantXOper);
-
-            int contFilas = hojaCantXOper.Dimension.Rows;
-            int contColumnas = hojaCantXOper.Dimension.Columns;
-
-
-            List<EmpleadoModel> empleados = new List<EmpleadoModel>();
-            int numPrimeraCelda = 2;
-
-
-            for (int row = 1; row <= contFilas; row++)
-            {
-                for (int col = 1; col <= contColumnas; col++)
-                {
-                    object cellValue = hojaCantXOper.Cells[row, col].Value;
-                    if (cellValue != null)
-                    {
-                        if (cellValue.ToString()!.Contains("SYMESA"))
-                        {
-                            bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()));
-
-                            if (!contieneTexto)
-                            {
-                                empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString()), Inconformidades: 0));
-                            }
-                            else
-                            {
-                                empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString())).FirstOrDefault().Leidos += int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString());
-                            }
-
-
-                        }
-                    }
-                }
-            }
-
-            int rowsTablaCalDetalles = hojaCalidadDetalles.Dimension.Rows;
-            int colsTablaCalDetalles = hojaCalidadDetalles.Dimension.Columns;
-
-            int totalInconformidades = 0;
-            int totalLeidos = 0;
-            double totalIdeal = 0;
-
-
-            for (int row = 1; row <= rowsTablaCalDetalles; row++)
-            {
-                for (int col = 1; col <= colsTablaCalDetalles; col++)
-                {
-                    object cellValue = hojaCalidadDetalles.Cells[row, col].Value;
-                    if (cellValue != null)
-                    {
-                        if (cellValue.ToString()!.Contains("SYMESA"))
-                        {
-                            totalInconformidades++;
-                            /*if (!empleados.Nombre.Contains(cellValue.ToString()!))
-                            {
-                                empleados.Add(cellValue.ToString()!);
-                            }*/
-                            bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()));
-
-                            /*if (empleados.Contains(empleado => empleado.Nombre == cellValue.ToString()))
-                            {
-
-                            }*/
-                            if (!contieneTexto)
-                            {
-                                empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: 0, Inconformidades: 1));
-                            }
-                            else
-                            {
-                                empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString())).FirstOrDefault().Inconformidades += 1;
-                            }
-
-
-                        }
-                    }
-                }
-            }
-
-
-
-         
 
             foreach (EmpleadoModel empleado in empleados)
             {
@@ -179,28 +138,57 @@ namespace MultasLectura.Controllers
                 totalIdeal += empleado.Leidos * 0.0015;
                 totalLeidos += empleado.Leidos;
             }
+        }
 
-            List<EmpleadoModel> empleadosOrdenados = empleados.OrderByDescending(emp => emp.Proporcion).ToList();
-
-            double idealPorcentaje = 0.0015;
-
-
-
-
-
-
-            Color verdeLetra = Color.FromArgb(1, 0, 97, 0);
+        private List<ColorModel> CargarColores()
+        {
+            /*Color verdeLetra = Color.FromArgb(1, 0, 97, 0);
             Color verdeFondo = Color.FromArgb(1, 198, 239, 206);
             Color rojoLetra = Color.FromArgb(1, 156, 0, 6);
             Color rojoFondo = Color.FromArgb(1, 255, 199, 206);
             Color amarilloLetra = Color.FromArgb(1, 156, 101, 0);
-            Color amarilloFondo = Color.FromArgb(1, 255, 235, 156);
+            Color amarilloFondo = Color.FromArgb(1, 255, 235, 156);*/
+
+            return new() {
+                new ColorModel("rojo", Color.FromArgb(1, 255, 199, 206), Color.FromArgb(1, 156, 0, 6)),
+                 new ColorModel("verde", Color.FromArgb(1, 198, 239, 206), Color.FromArgb(1, 0, 97, 0)),
+                 new ColorModel("amarillo", Color.FromArgb(1, 255, 235, 156),Color.FromArgb(1, 156, 101, 0)),
+
+            };
+        }
+
+        public void CrearTablaLecturistaInconformidades(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino)
+        {
+            int numPrimeraCelda = 2;
+            int totalInconformidades = 0;
+            int totalLeidos = 0;
+            double totalIdeal = 0;
+
+            CrearEncabezados(hojaDestino);
+
+            List<EmpleadoModel> empleados = CrearListaEmpleados(hojaCantXOper);
+
+            CalcularInconformidades(hojaCalidadDetalles, ref empleados, ref totalInconformidades);
+
+            CalcularProporcionIdealLeidos(ref empleados, ref totalIdeal, ref totalLeidos);
+         
+            List<EmpleadoModel> empleadosOrdenados = empleados.OrderByDescending(emp => emp.Proporcion).ToList();
+
+            double idealPorcentaje = 0.0015;
+
+            List<ColorModel> colores = CargarColores();
+
+
+          /*  Color verdeLetra = Color.FromArgb(1, 0, 97, 0);
+            Color verdeFondo = Color.FromArgb(1, 198, 239, 206);
+            Color rojoLetra = Color.FromArgb(1, 156, 0, 6);
+            Color rojoFondo = Color.FromArgb(1, 255, 199, 206);
+            Color amarilloLetra = Color.FromArgb(1, 156, 101, 0);
+            Color amarilloFondo = Color.FromArgb(1, 255, 235, 156);*/
 
 
             for (int i = 0; i < empleadosOrdenados.Count; i++)
             {
-                // MessageBox.Show(empleadosOrdenados[i].Proporcion.ToString());
-                // double acumulado = 0;
                 double incXOp = empleadosOrdenados[i].Inconformidades / empleadosOrdenados[i].Leidos;
 
 
