@@ -1,5 +1,7 @@
 ﻿using MultasLectura.Helpers;
 using MultasLectura.Interfaces;
+using MultasLectura.Models;
+using NPOI.SS.Formula.Functions;
 using OfficeOpenXml;
 using OfficeOpenXml.Sorting;
 using OfficeOpenXml.Style;
@@ -13,89 +15,105 @@ using System.Threading.Tasks;
 
 namespace MultasLectura.Controllers
 {
-    public class Empleado
-    {
-        private string nombre;
-        private int leidos;
-        private int inconformidades;
-        private double proporcion;
-        //private double proporcion;
-
-        public string Nombre { get { return nombre; } set { nombre = value; } }
-        public int Leidos { get { return leidos; } set { leidos = value; } }
-        public int Inconformidades { get { return inconformidades; } set { inconformidades = value; } }
-        public double Proporcion { get { return proporcion; } set { proporcion = value; } }
-
-        public void CalcularProporcion()
-        {
-            proporcion = (double)inconformidades / leidos;
-        }
-
-        public Empleado(string Nombre, int Leidos, int Inconformidades)
-        {
-            this.Nombre = Nombre;
-            this.Leidos = Leidos;
-            this.Inconformidades = Inconformidades;
-        }
-
-    }
-
-
     public class CalidadHojaResLecturistaController : ICalidadHojaResLecturistaController
     {
+        private void CrearEncabezados(ExcelWorksheet hoja)
+        {
+            Dictionary<string, string> headers = new()
+            {
+                ["A"] = "Lecturista",
+                ["B"] = "Leídos",
+                ["C"] = "Inconformidades",
+                ["D"] = "% inc x op",
+                ["E"] = "% inc x nc",
+                ["F"] = "Acumulado",
+                ["G"] = "Ideal",
+                ["H"] = "% inc x op",
+                ["I"] = "Desvío"
+            };
+            var claves = headers.Keys;
+
+            for (int i = 0; i < headers.Count; i++)
+            {
+                hoja.Cells[$"{claves.ElementAt(i)}1"].Value = headers[claves.ElementAt(i)];
+            }
+        }
+
+        private void CrearDiccionarioEmpleados(ExcelWorksheet hoja)
+        {
+            int contFilas = hoja.Dimension.Rows;
+           // int contColumnas = hoja.Dimension.Columns;
+
+
+            List<EmpleadoModel> empleados = new();
+            //  int numPrimeraCelda = 2;
+
+            int colEmpleado = LibroExcelHelper.ObtenerNumeroColumna(hoja, "empleado");
+            int colValores = LibroExcelHelper.ObtenerNumeroColumna(hoja, "compute_0005");
+
+            if (colEmpleado != -1 && colValores != -1)
+            {
+                for (int fila = 1; fila <= contFilas; fila++)
+                {
+                   // for (int col = 1; col <= contColumnas; col++)
+                   // {
+                        object cellValue = hoja.Cells[fila, colEmpleado].Value;
+                        if (cellValue != null)
+                        {
+                            if (cellValue.ToString()!.Contains("SYMESA"))
+                            {
+                                bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()!));
+
+                                if (!contieneTexto)
+                                {
+                                    empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: int.Parse(hoja.Cells[fila, colValores].Value.ToString()), Inconformidades: 0));
+                                }
+                                else
+                                {
+                                    empleados.Where(empleado => empleado.Nombre.Contains(cellValue.ToString())).FirstOrDefault().Leidos += int.Parse(hoja.Cells[fila, colValores].Value.ToString());
+                                }
+
+
+                            }
+                        }
+                    //}
+                }
+
+            }
+
+
+            
+
+        }
+
         public void CrearTablaLecturistaInconformidades(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino)
         {
-            // Obtener el número total de filas y columnas en la hoja de cálculo
-            int rowCount = hojaCantXOper.Dimension.Rows;
-            int colCount = hojaCantXOper.Dimension.Columns;
+            CrearEncabezados(hojaDestino);
 
-            hojaDestino.Cells["A1"].Value = "Lecturista";
-            hojaDestino.Cells["B1"].Value = "Leídos";
-            hojaDestino.Cells["C1"].Value = "Inconformidades";
-            hojaDestino.Cells["D1"].Value = "% inc x op";
-            hojaDestino.Cells["E1"].Value = "% inc x nc";
-            hojaDestino.Cells["F1"].Value = "Acumulado";
-            hojaDestino.Cells["G1"].Value = "Ideal";
-            hojaDestino.Cells["H1"].Value = "% inc x op";
-            hojaDestino.Cells["I1"].Value = "Desvío";
+            CrearDiccionarioEmpleados(hojaCantXOper);
+
+            int contFilas = hojaCantXOper.Dimension.Rows;
+            int contColumnas = hojaCantXOper.Dimension.Columns;
 
 
-
-            // ApplyBorders(celdaA25);
-            //LibroExcelModel.AplicarBordesARango(hojaDestino.Cells["A25:C31"]);
-
-            /* int totalT1 = 0;
-             int totalT2 = 0;
-             int totalT3 = 0;
-             int totalAltT1 = 0;
-             int totalAltT3 = 0;*/
-
-            List<Empleado> empleados = new List<Empleado>();
+            List<EmpleadoModel> empleados = new List<EmpleadoModel>();
             int numPrimeraCelda = 2;
 
 
-            for (int row = 1; row <= rowCount; row++)
+            for (int row = 1; row <= contFilas; row++)
             {
-                for (int col = 1; col <= colCount; col++)
+                for (int col = 1; col <= contColumnas; col++)
                 {
                     object cellValue = hojaCantXOper.Cells[row, col].Value;
                     if (cellValue != null)
                     {
                         if (cellValue.ToString()!.Contains("SYMESA"))
                         {
-                            /*if (!empleados.Nombre.Contains(cellValue.ToString()!))
-                            {
-                                empleados.Add(cellValue.ToString()!);
-                            }*/
                             bool contieneTexto = empleados.Any(empleado => empleado.Nombre.Contains(cellValue.ToString()));
 
-                            /*if (empleados.Contains(empleado => empleado.Nombre == cellValue.ToString()))
-                            {
-
-                            }*/
                             if (!contieneTexto)
                             {
-                                empleados.Add(new Empleado(Nombre: cellValue.ToString(), Leidos: int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString()), Inconformidades: 0));
+                                empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: int.Parse(hojaCantXOper.Cells[row, 5].Value.ToString()), Inconformidades: 0));
                             }
                             else
                             {
@@ -108,7 +126,6 @@ namespace MultasLectura.Controllers
                 }
             }
 
-            // Obtener el número total de filas y columnas en la hoja de cálculo
             int rowsTablaCalDetalles = hojaCalidadDetalles.Dimension.Rows;
             int colsTablaCalDetalles = hojaCalidadDetalles.Dimension.Columns;
 
@@ -139,7 +156,7 @@ namespace MultasLectura.Controllers
                             }*/
                             if (!contieneTexto)
                             {
-                                empleados.Add(new Empleado(Nombre: cellValue.ToString(), Leidos: 0, Inconformidades: 1));
+                                empleados.Add(new EmpleadoModel(Nombre: cellValue.ToString(), Leidos: 0, Inconformidades: 1));
                             }
                             else
                             {
@@ -154,42 +171,16 @@ namespace MultasLectura.Controllers
 
 
 
-            /*
+         
 
-            foreach (Empleado empleado in empleados)
-            {
-               // double acumulado = 0;
-                double incXOp = empleado.Inconformidades / empleado.Leidos;
-               
-                hojaDestino.Cells[$"A{numPrimeraCelda}"].Value = empleado.Nombre;
-                hojaDestino.Cells[$"B{numPrimeraCelda}"].Value = empleado.Leidos;
-                hojaDestino.Cells[$"C{numPrimeraCelda}"].Value = empleado.Inconformidades;
-                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Value = empleado.Inconformidades / empleado.Leidos;
-                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Value = incXOp;
-                hojaDestino.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
-                 hojaDestino.Cells[$"D{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
-                // hojaDestino.Cells[$"E{numPrimeraCelda}"].Value = empleado.Inconformidades / totalInconformidades;
-                hojaDestino.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
-                 hojaDestino.Cells[$"E{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
-
-               // acumulado += empleado.Inconformidades / totalInconformidades;
-               //MessageBox.Show(acumulado.ToString());
-                // hojaDestino.Cells[$"F{numPrimeraCelda}"].Value = acumulado;
-               // hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+{acumulado}";
-             
-                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
-
-                numPrimeraCelda++;
-            }*/
-
-            foreach (Empleado empleado in empleados)
+            foreach (EmpleadoModel empleado in empleados)
             {
                 empleado.CalcularProporcion();
                 totalIdeal += empleado.Leidos * 0.0015;
                 totalLeidos += empleado.Leidos;
             }
 
-            List<Empleado> empleadosOrdenados = empleados.OrderByDescending(emp => emp.Proporcion).ToList();
+            List<EmpleadoModel> empleadosOrdenados = empleados.OrderByDescending(emp => emp.Proporcion).ToList();
 
             double idealPorcentaje = 0.0015;
 

@@ -28,11 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            txtRutaPlazosDetalles = new TextBox();
-            btnPlazosDetalles = new Button();
-            txtRutaDiasRegl = new TextBox();
+            txtRutaReclamosDetalles = new TextBox();
+            btnReclamosDetalles = new Button();
             groupBox1 = new GroupBox();
-            btnDiasReglamentarios = new Button();
             btnGenerarLibroFinal = new Button();
             groupBox2 = new GroupBox();
             baremosAlturaT3 = new Label();
@@ -49,39 +47,29 @@
             groupBox2.SuspendLayout();
             SuspendLayout();
             // 
-            // txtRutaPlazosDetalles
+            // txtRutaReclamosDetalles
             // 
-            txtRutaPlazosDetalles.AllowDrop = true;
-            txtRutaPlazosDetalles.Location = new Point(6, 43);
-            txtRutaPlazosDetalles.Name = "txtRutaPlazosDetalles";
-            txtRutaPlazosDetalles.ReadOnly = true;
-            txtRutaPlazosDetalles.Size = new Size(364, 29);
-            txtRutaPlazosDetalles.TabIndex = 0;
+            txtRutaReclamosDetalles.AllowDrop = true;
+            txtRutaReclamosDetalles.Location = new Point(6, 71);
+            txtRutaReclamosDetalles.Name = "txtRutaReclamosDetalles";
+            txtRutaReclamosDetalles.ReadOnly = true;
+            txtRutaReclamosDetalles.Size = new Size(364, 29);
+            txtRutaReclamosDetalles.TabIndex = 0;
             // 
-            // btnPlazosDetalles
+            // btnReclamosDetalles
             // 
-            btnPlazosDetalles.BackColor = SystemColors.ActiveCaption;
-            btnPlazosDetalles.Location = new Point(376, 25);
-            btnPlazosDetalles.Name = "btnPlazosDetalles";
-            btnPlazosDetalles.Size = new Size(196, 63);
-            btnPlazosDetalles.TabIndex = 1;
-            btnPlazosDetalles.Text = "Cargar Archivo Plazos Detalles";
-            btnPlazosDetalles.UseVisualStyleBackColor = false;
-            // 
-            // txtRutaDiasRegl
-            // 
-            txtRutaDiasRegl.Location = new Point(6, 112);
-            txtRutaDiasRegl.Name = "txtRutaDiasRegl";
-            txtRutaDiasRegl.ReadOnly = true;
-            txtRutaDiasRegl.Size = new Size(364, 29);
-            txtRutaDiasRegl.TabIndex = 2;
+            btnReclamosDetalles.BackColor = SystemColors.ActiveCaption;
+            btnReclamosDetalles.Location = new Point(376, 53);
+            btnReclamosDetalles.Name = "btnReclamosDetalles";
+            btnReclamosDetalles.Size = new Size(196, 63);
+            btnReclamosDetalles.TabIndex = 1;
+            btnReclamosDetalles.Text = "Cargar Archivo Reclamos Detalles";
+            btnReclamosDetalles.UseVisualStyleBackColor = false;
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(btnDiasReglamentarios);
-            groupBox1.Controls.Add(btnPlazosDetalles);
-            groupBox1.Controls.Add(txtRutaPlazosDetalles);
-            groupBox1.Controls.Add(txtRutaDiasRegl);
+            groupBox1.Controls.Add(btnReclamosDetalles);
+            groupBox1.Controls.Add(txtRutaReclamosDetalles);
             groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
@@ -89,16 +77,6 @@
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "Subir Archivos";
-            // 
-            // btnDiasReglamentarios
-            // 
-            btnDiasReglamentarios.BackColor = SystemColors.ActiveCaption;
-            btnDiasReglamentarios.Location = new Point(376, 94);
-            btnDiasReglamentarios.Name = "btnDiasReglamentarios";
-            btnDiasReglamentarios.Size = new Size(196, 63);
-            btnDiasReglamentarios.TabIndex = 3;
-            btnDiasReglamentarios.Text = "Cargar Archivo Días Reglamentarios";
-            btnDiasReglamentarios.UseVisualStyleBackColor = false;
             // 
             // btnGenerarLibroFinal
             // 
@@ -109,7 +87,7 @@
             btnGenerarLibroFinal.Name = "btnGenerarLibroFinal";
             btnGenerarLibroFinal.Size = new Size(853, 42);
             btnGenerarLibroFinal.TabIndex = 5;
-            btnGenerarLibroFinal.Text = "GENERAR ARCHIVO PLAZOS";
+            btnGenerarLibroFinal.Text = "GENERAR ARCHIVO RECLAMOS";
             btnGenerarLibroFinal.UseVisualStyleBackColor = false;
             // 
             // groupBox2
@@ -241,11 +219,9 @@
 
         #endregion
 
-        private TextBox txtRutaPlazosDetalles;
-        private Button btnPlazosDetalles;
-        private TextBox txtRutaDiasRegl;
+        private TextBox txtRutaReclamosDetalles;
+        private Button btnReclamosDetalles;
         private GroupBox groupBox1;
-        private Button btnDiasReglamentarios;
         private Button btnGenerarLibroFinal;
         private GroupBox groupBox2;
         private Label label8;

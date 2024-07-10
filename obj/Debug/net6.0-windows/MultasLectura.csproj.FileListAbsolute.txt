@@ -54,3 +54,4 @@ C:\Users\maxio\Downloads\+Programacion\NET\proyectos\tablas-dinamicas\MultasLect
 C:\Users\maxio\Downloads\+Programacion\NET\proyectos\tablas-dinamicas\MultasLectura\obj\Debug\net6.0-windows\MultasLectura.Views.Loader.resources
 C:\Users\maxio\Downloads\+Programacion\NET\proyectos\tablas-dinamicas\MultasLectura\obj\Debug\net6.0-windows\MultasLectura.Views.FormPrincipal.resources
 C:\Users\maxio\Downloads\+Programacion\NET\proyectos\tablas-dinamicas\MultasLectura\obj\Debug\net6.0-windows\MultasLectura.Views.GenerarLibroPlazos.resources
+C:\Users\maxio\Downloads\+Programacion\NET\proyectos\tablas-dinamicas\MultasLectura\obj\Debug\net6.0-windows\MultasLectura.Views.GenerarLibroReclamos.resources
