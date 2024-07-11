@@ -15,7 +15,6 @@ namespace MultasLectura.Helpers
 {
     public class LibroExcelHelper
     {
-        //static public void IniciarProcesoCarga(System.Windows.Forms.TextBox txt, System.Action<string> funcionCargarLibro)
         static public void IniciarProcesoCarga(TextBox txt)
         {
             string filePath = CargarLibroExcel();
@@ -28,8 +27,35 @@ namespace MultasLectura.Helpers
             else
             {
                 txt.Text = filePath;
-                //funcionCargarLibro(filePath);
             }
+        }
+
+        static public string CargarLibroExcel()
+        {
+            try
+            {
+                OpenFileDialog openFileDialog = new()
+                {
+                    InitialDirectory = "c:\\",
+                    Filter = "Archivos Excel (*.xlsx)|*.xlsx|Archivos Excel (*.xls)|*.xls",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    return openFileDialog.FileName;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            catch
+            {
+                return "";
+            }
+
         }
 
         static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, ColorModel color)
@@ -37,9 +63,6 @@ namespace MultasLectura.Helpers
             hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
            hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Fill.BackgroundColor.SetColor(color.Fondo);
             hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Font.Color.SetColor(color.Letra);
-
-          //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-          //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
         }
 
         static public void AplicarBordeFinoARango(ExcelRangeBase rango)
@@ -60,10 +83,8 @@ namespace MultasLectura.Helpers
 
         static public void FormatoMoneda(ExcelRange rango)
         {
-            using (ExcelRange celda = rango)
-            {
-                celda.Style.Numberformat.Format = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)";
-            }
+            using ExcelRange celda = rango;
+            celda.Style.Numberformat.Format = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)";
         }
 
         static public void FormatoPorcentaje(ExcelRange rango)
@@ -99,7 +120,6 @@ namespace MultasLectura.Helpers
         static public string ValidarFormato(string filePath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             string fileExtension = Path.GetExtension(filePath);
 
             if (fileExtension.ToLower() == ".xlsx")
@@ -132,71 +152,69 @@ namespace MultasLectura.Helpers
             {
 
                 // Cargar archivo .xls
-                using (FileStream fs = new FileStream(xlsFilePath, FileMode.Open, FileAccess.Read))
+                using FileStream fs = new(xlsFilePath, FileMode.Open, FileAccess.Read);
+                HSSFWorkbook hssfwb = new(fs); // Crear instancia de libro .xls
+                XSSFWorkbook workbook = new(); // Crear instancia de libro .xlsx
+
+
+                // Copiar hojas de .xls a .xlsx
+                for (int i = 0; i < hssfwb.NumberOfSheets; i++)
                 {
-                    HSSFWorkbook hssfwb = new HSSFWorkbook(fs); // Crear instancia de libro .xls
-                    XSSFWorkbook workbook = new XSSFWorkbook(); // Crear instancia de libro .xlsx
+                    ISheet sheet = hssfwb.GetSheetAt(i);
+                    XSSFSheet newSheet = (XSSFSheet)workbook.CreateSheet(sheet.SheetName);
 
-
-                    // Copiar hojas de .xls a .xlsx
-                    for (int i = 0; i < hssfwb.NumberOfSheets; i++)
+                    // Copiar filas y celdas
+                    for (int j = 0; j <= sheet.LastRowNum; j++)
                     {
-                        ISheet sheet = hssfwb.GetSheetAt(i);
-                        XSSFSheet newSheet = (XSSFSheet)workbook.CreateSheet(sheet.SheetName);
+                        IRow row = sheet.GetRow(j);
+                        XSSFRow newRow = (XSSFRow)newSheet.CreateRow(j);
 
-                        // Copiar filas y celdas
-                        for (int j = 0; j <= sheet.LastRowNum; j++)
+                        if (row != null)
                         {
-                            IRow row = sheet.GetRow(j);
-                            XSSFRow newRow = (XSSFRow)newSheet.CreateRow(j);
-
-                            if (row != null)
+                            for (int k = 0; k < row.LastCellNum; k++)
                             {
-                                for (int k = 0; k < row.LastCellNum; k++)
+                                ICell cell = row.GetCell(k);
+                                if (cell != null)
                                 {
-                                    ICell cell = row.GetCell(k);
-                                    if (cell != null)
-                                    {
-                                        XSSFCell newCell = (XSSFCell)newRow.CreateCell(k);
-                                        newCell.SetCellValue(cell.ToString());
-                                    }
+                                    XSSFCell newCell = (XSSFCell)newRow.CreateCell(k);
+                                    newCell.SetCellValue(cell.ToString());
                                 }
                             }
                         }
                     }
-
-                    var partesPath = xlsFilePath.Split('\\');
-                    string pathGuardarConversion = "";
-
-                    foreach (string parte in partesPath)
-                    {
-                        if (partesPath[partesPath.Length - 1] != parte)
-                        {
-                            pathGuardarConversion += parte + '\\';
-                        }
-                    }
-
-                    string nombreOriginal = Path.GetFileNameWithoutExtension(xlsFilePath);
-
-                    //   Random random = new Random();
-
-                    // Generar un número aleatorio entre 1 y 100 (ambos inclusive)
-                    //  int numeroAleatorio = random.Next(1, 101);
-
-                    //  pathGuardarConversion += $"libro-conversion{numeroAleatorio}.xlsx";
-                   // DateTime.Now.ToString("yyyyMMdd") + "-" + DateTime.Now.ToString("HHmmss")
-                    pathGuardarConversion += $"{nombreOriginal}_{DateTime.Now.ToString("yyyyMMdd")}{DateTime.Now.ToString("HHmmss")}.xlsx";
-
-                    //  MessageBox.Show(partesPath[partesPath.Length - 1]);
-
-                    // Guardar como .xlsx
-                    using (FileStream fileOut = new FileStream(pathGuardarConversion, FileMode.Create))
-                    {
-                        workbook.Write(fileOut);
-                    }
-
-                    return pathGuardarConversion;
                 }
+
+                var partesPath = xlsFilePath.Split('\\');
+                string pathGuardarConversion = "";
+
+                foreach (string parte in partesPath)
+                {
+                    if (partesPath[partesPath.Length - 1] != parte)
+                    {
+                        pathGuardarConversion += parte + '\\';
+                    }
+                }
+
+                string nombreOriginal = Path.GetFileNameWithoutExtension(xlsFilePath);
+
+                //   Random random = new Random();
+
+                // Generar un número aleatorio entre 1 y 100 (ambos inclusive)
+                //  int numeroAleatorio = random.Next(1, 101);
+
+                //  pathGuardarConversion += $"libro-conversion{numeroAleatorio}.xlsx";
+                // DateTime.Now.ToString("yyyyMMdd") + "-" + DateTime.Now.ToString("HHmmss")
+                pathGuardarConversion += $"{nombreOriginal}_{DateTime.Now.ToString("yyyyMMdd")}{DateTime.Now.ToString("HHmmss")}.xlsx";
+
+                //  MessageBox.Show(partesPath[partesPath.Length - 1]);
+
+                // Guardar como .xlsx
+                using (FileStream fileOut = new FileStream(pathGuardarConversion, FileMode.Create))
+                {
+                    workbook.Write(fileOut);
+                }
+
+                return pathGuardarConversion;
 
 
             }
@@ -206,44 +224,7 @@ namespace MultasLectura.Helpers
             }
         }
 
-        static public string CargarLibroExcel()
-        {
-            try
-            {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-
-                // Configurar propiedades del OpenFileDialog
-                openFileDialog.InitialDirectory = "c:\\"; // Directorio inicial
-                //openFileDialog.Filter = "Archivos Excel (*.xlsx)|*.xlsx|Archivos Excel (*.xls)|*.xls|Todos los archivos (*.*)|*.*"; // Filtros de archivo
-                openFileDialog.Filter = "Archivos Excel (*.xlsx)|*.xlsx|Archivos Excel (*.xls)|*.xls";
-                openFileDialog.FilterIndex = 1; // Índice del filtro predeterminado
-                openFileDialog.RestoreDirectory = true; // Restaurar el directorio anterior al cerrar el diálogo
-
-                // Mostrar el diálogo y verificar si el usuario ha seleccionado un archivo
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    // Mostrar la ruta del archivo seleccionado en el TextBox
-                    // txtRutaCalidadDetalles.Text = openFileDialog.FileName;
-
-                    // AbrirArchivo2(openFileDialog.FileName);
-                    //   calidadController.CargarLibroCalidadDetalles(openFileDialog.FileName);
-
-                    // Aquí puedes realizar cualquier operación adicional con el archivo seleccionado
-                    // Por ejemplo, cargar y procesar el archivo Excel usando EPPlus como se mostró anteriormente
-                    return openFileDialog.FileName;
-                }
-                else
-                {
-                    //txtRutaCalidadDetalles.Text = string.Empty;
-                    return "";
-                }
-            }
-            catch
-            {
-                return "";
-            }
-
-        }
+        
 
         static public void ConvertirTextoANumero(ExcelRange rango)
         {
