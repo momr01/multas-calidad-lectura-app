@@ -11,7 +11,7 @@ namespace MultasLectura.Services
 {
     public class TablaLecturistaInconformidadesService
     {
-        private void CrearEncabezados(ExcelWorksheet hoja)
+        public void CrearEncabezados(ExcelWorksheet hoja)
         {
             Dictionary<string, string> headers = new()
             {
@@ -33,7 +33,7 @@ namespace MultasLectura.Services
             }
         }
 
-        private List<EmpleadoModel> CrearListaEmpleados(ExcelWorksheet hoja)
+        public List<EmpleadoModel> CrearListaEmpleados(ExcelWorksheet hoja)
         {
             int contFilas = hoja.Dimension.Rows;
 
@@ -78,7 +78,7 @@ namespace MultasLectura.Services
             return empleados;
         }
 
-        private void CalcularInconformidades(ExcelWorksheet hoja,
+        public void CalcularInconformidades(ExcelWorksheet hoja,
           ref List<EmpleadoModel> empleados,
           ref int totalInconformidades)
         {
@@ -123,7 +123,7 @@ namespace MultasLectura.Services
 
         }
 
-        private void CalcularProporcionIdealLeidos(ref List<EmpleadoModel> empleados, ref double totalIdeal, ref int totalLeidos)
+        public void CalcularProporcionIdealLeidos(ref List<EmpleadoModel> empleados, ref double totalIdeal, ref int totalLeidos)
         {
 
             foreach (EmpleadoModel empleado in empleados)
@@ -134,7 +134,7 @@ namespace MultasLectura.Services
             }
         }
 
-        private List<ColorModel> CargarColores()
+        public List<ColorModel> CargarColores()
         {
             /*Color verdeLetra = Color.FromArgb(1, 0, 97, 0);
             Color verdeFondo = Color.FromArgb(1, 198, 239, 206);
@@ -151,32 +151,32 @@ namespace MultasLectura.Services
             };
         }
 
-        private void ColumnaLecturistaA(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        public void ColumnaLecturistaA(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
             hoja.Cells[$"A{numPrimeraCelda}"].Value = empleado.Nombre;
 
         }
 
-        private void ColumnaLeidosB(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        public void ColumnaLeidosB(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
             hoja.Cells[$"B{numPrimeraCelda}"].Value = empleado.Leidos;
 
         }
 
-        private void ColumnaInconformidadesC(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        public void ColumnaInconformidadesC(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
             hoja.Cells[$"C{numPrimeraCelda}"].Value = empleado.Inconformidades;
 
         }
 
-        private void CalcularTotal(ExcelWorksheet hoja, char letraCelda, int numCelda, int valor)
+        public void CalcularTotal(ExcelWorksheet hoja, char letraCelda, int numCelda, int valor)
         {
             hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda}"].Value = valor;
             // hojaDestino.Cells[$"C{empleados.Count + 2}"].Value = totalInconformidades;
             //  hojaDestino.Cells[$"G{empleados.Count + 2}"].Value = (int)Math.Round(totalIdeal);
         }
 
-        private void ColumnaIncXOpD(ExcelWorksheet hoja, int numPrimeraCelda)
+        public void ColumnaIncXOpD(ExcelWorksheet hoja, int numPrimeraCelda)
         {
             hoja.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"D{numPrimeraCelda}"]);
@@ -184,14 +184,14 @@ namespace MultasLectura.Services
 
         }
 
-        private void ColumnaIncXNcE(ExcelWorksheet hoja, int numPrimeraCelda, int totalInconformidades)
+        public void ColumnaIncXNcE(ExcelWorksheet hoja, int numPrimeraCelda, int totalInconformidades)
         {
             hoja.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
             hoja.Cells[$"E{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
 
         }
 
-        private void ColumnaAcumuladoF(int i, ExcelWorksheet hoja, int numPrimeraCelda)
+        public void ColumnaAcumuladoF(int i, ExcelWorksheet hoja, int numPrimeraCelda)
         {
             if (i == 0)
             {
@@ -206,7 +206,7 @@ namespace MultasLectura.Services
 
         }
 
-        private double ColumnaIdealG(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        public double ColumnaIdealG(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
             double idealPorcentaje = 0.0015;
             double ideal = empleado.Leidos * idealPorcentaje;
@@ -224,7 +224,7 @@ namespace MultasLectura.Services
 
         }
 
-        private void ColumnaIncXOpIdealH(ExcelWorksheet hoja, int numPrimeraCelda)
+        public void ColumnaIncXOpIdealH(ExcelWorksheet hoja, int numPrimeraCelda)
         {
             hoja.Cells[$"H{numPrimeraCelda}"].Value = "0,0015";
 
@@ -238,7 +238,7 @@ namespace MultasLectura.Services
 
         }
 
-        private double ColumnaDesvioI(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado, double ideal, double totalIdeal)
+        public double ColumnaDesvioI(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado, double ideal, double totalIdeal)
         {
             // double desvio = (ideal - empleado.Inconformidades) / 403.578;
             double desvio = (ideal - empleado.Inconformidades) / totalIdeal;
@@ -250,7 +250,7 @@ namespace MultasLectura.Services
 
         }
 
-        private void ColorearSegunDesvio(ExcelWorksheet hoja, int numPrimeraCelda, List<ColorModel> colores, double desvio)
+        public void ColorearSegunDesvio(ExcelWorksheet hoja, int numPrimeraCelda, List<ColorModel> colores, double desvio)
         {
             if (Math.Round(desvio, 4) <= -0.045)
             {
