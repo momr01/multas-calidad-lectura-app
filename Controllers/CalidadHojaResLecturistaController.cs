@@ -157,6 +157,145 @@ namespace MultasLectura.Controllers
             };
         }
 
+        private void ColumnaLecturistaA(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        {
+            hoja.Cells[$"A{numPrimeraCelda}"].Value = empleado.Nombre;
+
+        }
+
+        private void ColumnaLeidosB(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        {
+            hoja.Cells[$"B{numPrimeraCelda}"].Value = empleado.Leidos;
+
+        }
+
+        private void ColumnaInconformidadesC(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        {
+            hoja.Cells[$"C{numPrimeraCelda}"].Value = empleado.Inconformidades;
+
+        }
+
+        private void CalcularTotal(ExcelWorksheet hoja, char letraCelda, int numCelda, int valor)
+        {
+            hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda}"].Value = valor;
+           // hojaDestino.Cells[$"C{empleados.Count + 2}"].Value = totalInconformidades;
+          //  hojaDestino.Cells[$"G{empleados.Count + 2}"].Value = (int)Math.Round(totalIdeal);
+        }
+
+        private void ColumnaIncXOpD(ExcelWorksheet hoja, int numPrimeraCelda)
+        {
+            hoja.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
+            LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"D{numPrimeraCelda}"]);
+          //  hoja.Cells[$"D{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+
+        }
+
+        private void ColumnaIncXNcE(ExcelWorksheet hoja, int numPrimeraCelda, int totalInconformidades)
+        {
+            hoja.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
+            hoja.Cells[$"E{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+
+        }
+
+        private void ColumnaAcumuladoF(int i, ExcelWorksheet hoja, int numPrimeraCelda)
+        {
+            if (i == 0)
+            {
+                hoja.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}";
+            }
+            else
+            {
+                hoja.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}";
+            }
+
+            hoja.Cells[$"F{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+
+        }
+
+        private double ColumnaIdealG(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
+        {
+            double idealPorcentaje = 0.0015;
+            double ideal = empleado.Leidos * idealPorcentaje;
+
+            //hojaDestino.Cells[$"G{numPrimeraCelda}"].Formula = $"+B{numPrimeraCelda}*{ideal}";
+            hoja.Cells[$"G{numPrimeraCelda}"].Value = $"{ideal}";
+
+            if (double.TryParse(hoja.Cells[$"G{numPrimeraCelda}"].Value?.ToString(), out double valor))
+            {
+                // Asignar el valor convertido de vuelta a la celda
+                hoja.Cells[$"G{numPrimeraCelda}"].Value = (int)Math.Round(valor);
+            }
+
+            return ideal;
+
+        }
+
+        private void ColumnaIncXOpIdealH(ExcelWorksheet hoja, int numPrimeraCelda)
+        {
+            hoja.Cells[$"H{numPrimeraCelda}"].Value = "0,0015";
+
+            if (double.TryParse(hoja.Cells[$"H{numPrimeraCelda}"].Value?.ToString(), out double valor2))
+            {
+                // Asignar el valor convertido de vuelta a la celda
+                hoja.Cells[$"H{numPrimeraCelda}"].Value = valor2;
+            }
+
+            hoja.Cells[$"H{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+
+        }
+
+        private double ColumnaDesvioI(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado, double ideal, double totalIdeal)
+        {
+            // double desvio = (ideal - empleado.Inconformidades) / 403.578;
+            double desvio = (ideal - empleado.Inconformidades) / totalIdeal;
+
+            hoja.Cells[$"I{numPrimeraCelda}"].Value = desvio;
+            hoja.Cells[$"I{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+
+            return desvio;
+
+        }
+
+        private void ColorearSegunDesvio(ExcelWorksheet hoja, int numPrimeraCelda, List<ColorModel> colores, double desvio)
+        {
+            if (Math.Round(desvio, 4) <= -0.045)
+            {
+                LibroExcelHelper.ColorFondoLetra(hoja, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("rojo")).FirstOrDefault()!);
+                LibroExcelHelper.ColorFondoLetra(hoja, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("rojo")).FirstOrDefault()!);
+
+                /* hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 199, 206));
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 0, 6));
+
+                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);*/
+            }
+            else if (Math.Round(desvio, 4) >= -0.0449 && Math.Round(desvio, 4) <= -0.001)
+            {
+                LibroExcelHelper.ColorFondoLetra(hoja, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("amarillo")).FirstOrDefault()!);
+                LibroExcelHelper.ColorFondoLetra(hoja, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("amarillo")).FirstOrDefault()!);
+
+                /*hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 235, 156));
+                hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 101, 0));
+
+                hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);*/
+            }
+            else
+            {
+                LibroExcelHelper.ColorFondoLetra(hoja, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("verde")).FirstOrDefault()!);
+                LibroExcelHelper.ColorFondoLetra(hoja, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("verde")).FirstOrDefault()!);
+                /* hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 198, 239, 206));
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 0, 97, 0));
+
+                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);*/
+            }
+
+        }
+
         public void CrearTablaLecturistaInconformidades(ExcelWorksheet hojaCantXOper, ExcelWorksheet hojaCalidadDetalles, ExcelWorksheet hojaDestino)
         {
             int numPrimeraCelda = 2;
@@ -189,96 +328,109 @@ namespace MultasLectura.Controllers
 
             for (int i = 0; i < empleadosOrdenados.Count; i++)
             {
-                double incXOp = empleadosOrdenados[i].Inconformidades / empleadosOrdenados[i].Leidos;
 
+                // hojaDestino.Cells[$"A{numPrimeraCelda}"].Value = empleadosOrdenados[i].Nombre;
+                ColumnaLecturistaA(hojaDestino, numPrimeraCelda, empleadosOrdenados[i]);
 
-                hojaDestino.Cells[$"A{numPrimeraCelda}"].Value = empleadosOrdenados[i].Nombre;
-                hojaDestino.Cells[$"B{numPrimeraCelda}"].Value = empleadosOrdenados[i].Leidos;
-                hojaDestino.Cells[$"C{numPrimeraCelda}"].Value = empleadosOrdenados[i].Inconformidades;
-                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Value = empleado.Inconformidades / empleado.Leidos;
-                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Value = incXOp;
-                hojaDestino.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
-                hojaDestino.Cells[$"D{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
-                // hojaDestino.Cells[$"E{numPrimeraCelda}"].Value = empleado.Inconformidades / totalInconformidades;
-                hojaDestino.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
-                hojaDestino.Cells[$"E{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+                //  hojaDestino.Cells[$"B{numPrimeraCelda}"].Value = empleadosOrdenados[i].Leidos;
+                ColumnaLeidosB(hojaDestino, numPrimeraCelda, empleadosOrdenados[i]);
 
-                // acumulado += empleado.Inconformidades / totalInconformidades;
-                //MessageBox.Show(acumulado.ToString());
-                // hojaDestino.Cells[$"F{numPrimeraCelda}"].Value = acumulado;
-                // hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+{acumulado}";
+                // hojaDestino.Cells[$"C{numPrimeraCelda}"].Value = empleadosOrdenados[i].Inconformidades;
+                ColumnaInconformidadesC(hojaDestino, numPrimeraCelda, empleadosOrdenados[i]);
 
+                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
+                // hojaDestino.Cells[$"D{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+                ColumnaIncXOpD(hojaDestino, numPrimeraCelda);
 
-                if (i == 0)
-                {
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}";
-                }
-                else
-                {
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}";
-                }
-
-                hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+                // hojaDestino.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
+                // hojaDestino.Cells[$"E{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+                ColumnaIncXNcE(hojaDestino, numPrimeraCelda, totalInconformidades);
 
 
 
+                /* if (i == 0)
+                 {
+                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}";
+                 }
+                 else
+                 {
+                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}";
+                 }
 
-                double ideal = empleadosOrdenados[i].Leidos * idealPorcentaje;
-
-                //hojaDestino.Cells[$"G{numPrimeraCelda}"].Formula = $"+B{numPrimeraCelda}*{ideal}";
-                hojaDestino.Cells[$"G{numPrimeraCelda}"].Value = $"{ideal}";
-
-                if (double.TryParse(hojaDestino.Cells[$"G{numPrimeraCelda}"].Value?.ToString(), out double valor))
-                {
-                    // Asignar el valor convertido de vuelta a la celda
-                    hojaDestino.Cells[$"G{numPrimeraCelda}"].Value = (int)Math.Round(valor);
-                }
-
-
-
-                hojaDestino.Cells[$"H{numPrimeraCelda}"].Value = "0,0015";
-
-                if (double.TryParse(hojaDestino.Cells[$"H{numPrimeraCelda}"].Value?.ToString(), out double valor2))
-                {
-                    // Asignar el valor convertido de vuelta a la celda
-                    hojaDestino.Cells[$"H{numPrimeraCelda}"].Value = valor2;
-                }
-
-                hojaDestino.Cells[$"H{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
+                 hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";*/
+                ColumnaAcumuladoF(i, hojaDestino, numPrimeraCelda);
 
 
-                double desvio = (ideal - empleadosOrdenados[i].Inconformidades) / 403.578;
 
-                hojaDestino.Cells[$"I{numPrimeraCelda}"].Value = desvio;
-                hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";
 
-                if (Math.Round(desvio, 4) <= -0.045)
-                {
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                /*  double ideal = empleadosOrdenados[i].Leidos * idealPorcentaje;
+
+                  hojaDestino.Cells[$"G{numPrimeraCelda}"].Value = $"{ideal}";
+
+                  if (double.TryParse(hojaDestino.Cells[$"G{numPrimeraCelda}"].Value?.ToString(), out double valor))
+                  {
+
+                      hojaDestino.Cells[$"G{numPrimeraCelda}"].Value = (int)Math.Round(valor);
+                  }*/
+                double ideal = ColumnaIdealG(hojaDestino, numPrimeraCelda, empleadosOrdenados[i]);
+
+
+
+                /* hojaDestino.Cells[$"H{numPrimeraCelda}"].Value = "0,0015";
+
+                 if (double.TryParse(hojaDestino.Cells[$"H{numPrimeraCelda}"].Value?.ToString(), out double valor2))
+                 {
+
+                     hojaDestino.Cells[$"H{numPrimeraCelda}"].Value = valor2;
+                 }
+
+                 hojaDestino.Cells[$"H{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";*/
+                ColumnaIncXOpIdealH(hojaDestino, numPrimeraCelda);
+
+
+                /* double desvio = (ideal - empleadosOrdenados[i].Inconformidades) / 403.578;
+
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Value = desvio;
+                 hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Numberformat.Format = "0.00%";*/
+                double desvio = ColumnaDesvioI(hojaDestino, numPrimeraCelda, empleadosOrdenados[i], ideal, totalIdeal);
+
+                ColorearSegunDesvio(hojaDestino, numPrimeraCelda, colores, desvio);
+
+               // if (Math.Round(desvio, 4) <= -0.045)
+               // {
+             //       LibroExcelHelper.ColorFondoLetra(hojaDestino, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("rojo")).FirstOrDefault()!);
+             //       LibroExcelHelper.ColorFondoLetra(hojaDestino, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("rojo")).FirstOrDefault()!);
+
+                   /* hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 199, 206));
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 0, 6));
 
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
-                }
-                else if (Math.Round(desvio, 4) >= -0.0449 && Math.Round(desvio, 4) <= -0.001)
-                {
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);*/
+              //  }
+               // else if (Math.Round(desvio, 4) >= -0.0449 && Math.Round(desvio, 4) <= -0.001)
+               // {
+               //     LibroExcelHelper.ColorFondoLetra(hojaDestino, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("amarillo")).FirstOrDefault()!);
+               //     LibroExcelHelper.ColorFondoLetra(hojaDestino, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("amarillo")).FirstOrDefault()!);
+                   
+                    /*hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 235, 156));
                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 101, 0));
 
                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
-                }
-                else
-                {
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 198, 239, 206));
-                    hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 0, 97, 0));
+                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightYellow);*/
+              //  }
+              //  else
+              //  {
+                 //   LibroExcelHelper.ColorFondoLetra(hojaDestino, 'i', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("verde")).FirstOrDefault()!);
+                 //   LibroExcelHelper.ColorFondoLetra(hojaDestino, 'f', numPrimeraCelda, colores.Where(color => color.Nombre.Contains("verde")).FirstOrDefault()!);
+                    /* hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 198, 239, 206));
+                     hojaDestino.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 0, 97, 0));
 
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-                }
+                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                     hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);*/
+              //  }
 
 
 
@@ -357,15 +509,18 @@ namespace MultasLectura.Controllers
             // Console.WriteLine(); // Nueva línea después de cada fila
             //  }
 
-            hojaDestino.Cells[$"B{empleados.Count + 2}"].Value = totalLeidos;
+            CalcularTotal(hojaDestino, 'b', empleados.Count + 2, totalLeidos);
+            CalcularTotal(hojaDestino, 'c', empleados.Count + 2, totalInconformidades);
+            CalcularTotal(hojaDestino, 'g', empleados.Count + 2, (int)Math.Round(totalIdeal));
+
+            /*hojaDestino.Cells[$"B{empleados.Count + 2}"].Value = totalLeidos;
             hojaDestino.Cells[$"C{empleados.Count + 2}"].Value = totalInconformidades;
             hojaDestino.Cells[$"G{empleados.Count + 2}"].Value = (int)Math.Round(totalIdeal);
 
 
-            MessageBox.Show(empleados.Count.ToString());
+            MessageBox.Show(empleados.Count.ToString());*/
 
             var rangoHojaResLecturista = hojaDestino.Cells[hojaDestino.Dimension.Address];
-
             LibroExcelHelper.AplicarBordeFinoARango(rangoHojaResLecturista);
 
             //hojaDestino.Cells.AutoFitColumns();

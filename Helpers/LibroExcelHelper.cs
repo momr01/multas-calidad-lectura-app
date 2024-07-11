@@ -1,4 +1,5 @@
 ﻿using Aspose.Cells;
+using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -31,11 +32,11 @@ namespace MultasLectura.Helpers
             }
         }
 
-        static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, Color color)
+        static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, ColorModel color)
         {
             hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-           // hoja.Cells[$"I{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(1, 255, 199, 206));
-        //    hoja.Cells[$"I{numPrimeraCelda}"].Style.Font.Color.SetColor(Color.FromArgb(1, 156, 0, 6));
+           hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Fill.BackgroundColor.SetColor(color.Fondo);
+            hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Font.Color.SetColor(color.Letra);
 
           //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
           //  hojaDestino.Cells[$"F{numPrimeraCelda}"].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
