@@ -1,4 +1,5 @@
 ﻿using MultasLectura.Interfaces;
+using MultasLectura.Services;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,22 @@ namespace MultasLectura.Controllers
 {
     public class CalidadHojaCuadrosController : ICalidadHojaCuadrosController
     {
+        private readonly CalidadHojaCuadrosService _service;
+
+        public CalidadHojaCuadrosController()
+        {
+            _service = new CalidadHojaCuadrosService();
+        }
+
         public void CrearTablaDinEmpleadoTotal(ExcelWorksheet hoja, ExcelRange rango)
         {
-            var pivotTable = hoja.PivotTables.Add(hoja.Cells["A1"], rango, "TablaDinEmpleadoTotal");
-            pivotTable.RowFields.Add(pivotTable.Fields["empleado"]);
-            pivotTable.DataFields.Add(pivotTable.Fields["compute_0005"]);
-            pivotTable.DataFields[0].Function = OfficeOpenXml.Table.PivotTable.DataFieldFunctions.Sum;
+           _service.TablaDinamica(hoja, "A1", rango, "TablaDinEmpleadoTotal", "empleado", "compute_0005", OfficeOpenXml.Table.PivotTable.DataFieldFunctions.Sum);
         }
 
         public void CrearTablaDinLectorTotal(ExcelWorksheet hoja, ExcelRange rango)
         {
-            var pivotTable = hoja.PivotTables.Add(hoja.Cells["D1"], rango, "TablaDinLectorTotal");
-            pivotTable.RowFields.Add(pivotTable.Fields["lector"]);
-            pivotTable.DataFields.Add(pivotTable.Fields["nic"]);
-            pivotTable.DataFields[0].Function = OfficeOpenXml.Table.PivotTable.DataFieldFunctions.Count;
+            _service.TablaDinamica(hoja, "d1", rango, "TablaDinLectorTotal", "lector", "nic", OfficeOpenXml.Table.PivotTable.DataFieldFunctions.Count);
         }
+
     }
 }
