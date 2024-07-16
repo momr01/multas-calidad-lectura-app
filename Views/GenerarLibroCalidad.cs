@@ -13,19 +13,19 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Runtime.CompilerServices;
 using NPOI.SS.Formula.Functions;
-using MultasLectura.Interfaces;
 using MultasLectura.Models;
-using MultasLectura.Controllers;
+using MultasLectura.LibroCalidad.Controllers;
 using MultasLectura.Views;
 using MultasLectura.Helpers;
+using MultasLectura.LibroCalidad.Interfaces;
 
 namespace MultasLectura
 {
     public partial class GenerarLibroCalidad : Form
     {
         private readonly ILibroCalidadController _calidadController;
-        private readonly BaremoModel _baremos = new BaremoModel();
-        private readonly MetaModel _metas = new MetaModel();
+        private readonly BaremoModel _baremos = new();
+        private readonly MetaModel _metas = new();
 
         private Loader _loaderForm;
 
@@ -54,6 +54,26 @@ namespace MultasLectura
             txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop!;
             txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter!;
             txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop!;
+        }
+
+        private void DragDropTextBox(System.Windows.Forms.TextBox txt, DragEventHandler DragEnter, DragEventHandler DragDrop)
+        {
+            txt.AllowDrop = true;
+
+            txt.DragDrop += DragDrop;
+            txt.DragEnter += DragEnter;
+
+            /*txtRutaCalidadDetalles.AllowDrop = true;
+            txtRutaCalXOperarios.AllowDrop = true;
+            txtRutaReclamosDetalles.AllowDrop = true;
+
+            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter!;
+            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop!;
+            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter!;
+            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop!;
+            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter!;
+            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop!;*/
+
         }
 
         private void CargarDatosBaremos()

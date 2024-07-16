@@ -1,6 +1,6 @@
 ﻿using Aspose.Cells.Charts;
 using MultasLectura.Helpers;
-using MultasLectura.Interfaces;
+using MultasLectura.LibroCalidad.Interfaces;
 using MultasLectura.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controllers
+namespace MultasLectura.LibroCalidad.Controllers
 {
     public class MetodoLineal
     {
@@ -25,21 +25,21 @@ namespace MultasLectura.Controllers
 
         public MetodoLineal(string descripcion, int cantidad, double importe)
         {
-            this._descripcion = descripcion;
-            this._cantidad = cantidad;
-            this._importe = importe;
+            _descripcion = descripcion;
+            _cantidad = cantidad;
+            _importe = importe;
         }
 
         //public string Obtener
 
         public void CalcularImporteConBaremos(double baremo)
         {
-           // if (!baremo.Equals(0))
-           // {
-                _importe = 2 * _cantidad * baremo;
-          //  }
-           
-           // return _importe;
+            // if (!baremo.Equals(0))
+            // {
+            _importe = 2 * _cantidad * baremo;
+            //  }
+
+            // return _importe;
         }
 
         public void SumarCantidades(int cantidad2)
@@ -80,10 +80,11 @@ namespace MultasLectura.Controllers
                 hoja.Cells[$"F{numFila}"].Value = claves.ElementAt(i);
                 hoja.Cells[$"G{numFila}"].Value = datos[claves.ElementAt(i)];
 
-                if(numFila >= 5 && numFila <= 7)
+                if (numFila >= 5 && numFila <= 7)
                 {
                     hoja.Cells[$"G{numFila}"].Style.Numberformat.Format = "0.00%";
-                } else
+                }
+                else
                 {
                     LibroExcelHelper.FormatoMoneda(hoja.Cells[$"G{numFila}"]);
                 }
@@ -91,11 +92,11 @@ namespace MultasLectura.Controllers
             }
             LibroExcelHelper.AplicarBordeGruesoARango(hoja.Cells[$"F{primeraFilaEstilizar}:G{numFila - 1}"]);
             LibroExcelHelper.FormatoNegrita(hoja.Cells[$"F1:G{numFila - 1}"]);
-          
+
         }
 
         public void CrearTablaDinTipoEstado(ExcelWorksheet hoja, ExcelRange rango)
-        {      
+        {
             var pivotTable = hoja.PivotTables.Add(hoja.Cells["A1"], rango, "TablaDinamicaTipoEstado");
             pivotTable.RowFields.Add(pivotTable.Fields["tipo_certificacion"]);
             pivotTable.RowFields.Add(pivotTable.Fields["estado"]);
@@ -127,12 +128,12 @@ namespace MultasLectura.Controllers
                     {
                         foreach (MetodoLineal dato in datos)
                         {
-                            if(cellValue.ToString() == dato.Descripcion)
+                            if (cellValue.ToString() == dato.Descripcion)
                             {
                                 dato.Cantidad++;
                             }
                         }
-                    }   
+                    }
                 }
             }
 
@@ -141,22 +142,24 @@ namespace MultasLectura.Controllers
             int totalCantidades = 0;
             double totalImportes = 0;
 
-            foreach(MetodoLineal dato in datos)
+            foreach (MetodoLineal dato in datos)
             {
-                if(dato.Descripcion.Contains("T1") || dato.Descripcion.Contains("T3"))
+                if (dato.Descripcion.Contains("T1") || dato.Descripcion.Contains("T3"))
                 {
                     if (dato.Descripcion.Contains("Altura"))
                     {
                         dato.CalcularImporteConBaremos(baremos.AlturaT1);
-                    } else
+                    }
+                    else
                     {
                         dato.CalcularImporteConBaremos(baremos.T1);
                     }
-                } else
+                }
+                else
                 {
                     dato.CalcularImporteConBaremos(baremos.T2);
                 }
-                
+
                 totalCantidades += dato.Cantidad;
                 totalImportes += dato.Importe;
 
@@ -169,12 +172,13 @@ namespace MultasLectura.Controllers
 
             hojaDestino.Cells[$"B{numFila}"].Value = totalCantidades;
             hojaDestino.Cells[$"C{numFila}"].Value = totalImportes;
-            
+
             LibroExcelHelper.FondoSolido(hojaDestino.Cells[$"C{numFila}"], Color.FromArgb(1, 252, 213, 180));
             LibroExcelHelper.FormatoMoneda(hojaDestino.Cells[$"C{comienzoTabla + 1}:C{numFila}"]);
             LibroExcelHelper.AplicarBordeFinoARango(hojaDestino.Cells[$"A{comienzoTabla}:C{numFila}"]);
 
-            return new() {
+            return new()
+            {
                 ["total"] = totalCantidades,
                 ["importe"] = totalImportes
             };
@@ -209,7 +213,8 @@ namespace MultasLectura.Controllers
                     if (dato.Descripcion.ToLower().Contains("t1"))
                     {
                         dato.CalcularImporteConBaremos(baremos.T1);
-                    } else
+                    }
+                    else
                     {
                         dato.CalcularImporteConBaremos(baremos.T2);
                     }
@@ -219,15 +224,15 @@ namespace MultasLectura.Controllers
 
             }
 
-      
+
 
             foreach (MetodoLineal dato in datos)
             {
 
-                if(dato.Descripcion.ToLower().Contains("metodo lineal"))
+                if (dato.Descripcion.ToLower().Contains("metodo lineal"))
                 {
                     dato.SumarCantidades(totalCantidadesReclamos);
-                    dato.SumarImportes(totalImportesReclamos);  
+                    dato.SumarImportes(totalImportesReclamos);
                 }
 
                 hoja.Cells[$"A{numFila + 1}"].Value = dato.Descripcion;
@@ -252,9 +257,10 @@ namespace MultasLectura.Controllers
 
             hoja.Cells.AutoFitColumns();
 
-            return new() { 
-                
-               ["propInconformidades"] = propInconformidades,
+            return new()
+            {
+
+                ["propInconformidades"] = propInconformidades,
                 ["totalMetLineal"] = datos.Where(dato => dato.Descripcion.ToLower().Contains("metodo lineal")).FirstOrDefault().Importe
             };
         }
@@ -265,14 +271,15 @@ namespace MultasLectura.Controllers
 
             if (propInconformidades > metas.Meta1)
             {
-                if(propInconformidades > metas.Meta2)
+                if (propInconformidades > metas.Meta2)
                 {
                     double calcAuxiliar = (propInconformidades - metas.Meta1) / (0.01 - metas.Meta1);
                     importeMultaFinal = importeTotalCertificacion * Math.Pow(calcAuxiliar, 2);
-                   
-                } else
+
+                }
+                else
                 {
-                    importeMultaFinal = (propInconformidades * importeTotalMetLineal) / propInconformidades;
+                    importeMultaFinal = propInconformidades * importeTotalMetLineal / propInconformidades;
                 }
             }
 

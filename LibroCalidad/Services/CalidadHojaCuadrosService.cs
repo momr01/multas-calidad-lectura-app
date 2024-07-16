@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Services
+namespace MultasLectura.LibroCalidad.Services
 {
     public class CalidadHojaCuadrosService
     {

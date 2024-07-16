@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controllers
+namespace MultasLectura.Enums
 {
-    internal class LibroPlazosController
+    public enum TipoOpCelda
     {
+        Value,
+        Formula
     }
 }

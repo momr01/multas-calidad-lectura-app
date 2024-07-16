@@ -1,4 +1,6 @@
-﻿using MultasLectura.Helpers;
+﻿using Aspose.Cells;
+using MultasLectura.Enums;
+using MultasLectura.Helpers;
 using MultasLectura.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.DataValidation;
@@ -8,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Services
+namespace MultasLectura.LibroCalidad.Services
 {
     public class CalidadHojaResLecturistaService
     {
@@ -145,65 +147,35 @@ namespace MultasLectura.Services
             };
         }
 
-        public enum TipoOpCelda
-        {
-            Value,
-            Formula
-        }
-
-        private void AsignarValorFormulaACelda<V>(ExcelWorksheet hoja, string celda, V valor, TipoOpCelda tipo)
-        {
-            ExcelRange rango = hoja.Cells[$"{celda}"];
-
-            switch (tipo)
-            {
-                case TipoOpCelda.Value:
-                    rango.Value = valor;
-                    break;
-                case TipoOpCelda.Formula:
-                    rango.Formula = valor!.ToString();
-                    break;
-            }
-           // hoja.Cells[$"{celda}"].Value = valor;
-        }
-
         public void ColumnaLecturistaA(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
-            //hoja.Cells[$"A{numPrimeraCelda}"].Value = empleado.Nombre;
-           // AsignarValorACelda(hoja, $"A{numPrimeraCelda}", empleado.Nombre);
-
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"A{numPrimeraCelda}", empleado.Nombre, TipoOpCelda.Value);
         }
 
         public void ColumnaLeidosB(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
-            // hoja.Cells[$"B{numPrimeraCelda}"].Value = empleado.Leidos;
-          //  AsignarValorACelda(hoja, $"B{numPrimeraCelda}", empleado.Leidos);
-
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"B{numPrimeraCelda}", empleado.Leidos, TipoOpCelda.Value);
         }
 
         public void ColumnaInconformidadesC(ExcelWorksheet hoja, int numPrimeraCelda, EmpleadoModel empleado)
         {
-            //hoja.Cells[$"C{numPrimeraCelda}"].Value = empleado.Inconformidades;
-            //AsignarValorACelda(hoja, $"C{numPrimeraCelda}", empleado .Inconformidades);
-
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"C{numPrimeraCelda}", empleado.Inconformidades, TipoOpCelda.Value);
         }
 
         public void CalcularTotal(ExcelWorksheet hoja, char letraCelda, int numCelda, int valor)
         {
-            //hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda}"].Value = valor;
-           // AsignarValorACelda(hoja, $"{letraCelda.ToString().ToUpper()}{numCelda}", valor);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"{letraCelda.ToString().ToUpper()}{numCelda}", valor, TipoOpCelda.Value);
         }
 
         public void ColumnaIncXOpD(ExcelWorksheet hoja, int numPrimeraCelda)
         {
-            hoja.Cells[$"D{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/B{numPrimeraCelda}";
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"D{numPrimeraCelda}", $"C{numPrimeraCelda}/B{numPrimeraCelda}", TipoOpCelda.Formula);
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"D{numPrimeraCelda}"]);
-
         }
 
         public void ColumnaIncXNcE(ExcelWorksheet hoja, int numPrimeraCelda, int totalInconformidades)
         {
-            hoja.Cells[$"E{numPrimeraCelda}"].Formula = $"C{numPrimeraCelda}/{totalInconformidades}";
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"E{numPrimeraCelda}", $"C{numPrimeraCelda}/{totalInconformidades}", TipoOpCelda.Formula);
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"E{numPrimeraCelda}"]);
         }
 
@@ -211,11 +183,11 @@ namespace MultasLectura.Services
         {
             if (i == 0)
             {
-                hoja.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}";
+                LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numPrimeraCelda}", $"+E{numPrimeraCelda}", TipoOpCelda.Formula);
             }
             else
             {
-                hoja.Cells[$"F{numPrimeraCelda}"].Formula = $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}";
+                LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numPrimeraCelda}", $"+E{numPrimeraCelda}+F{numPrimeraCelda - 1}", TipoOpCelda.Formula);
             }
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"F{numPrimeraCelda}"]);
         }
@@ -224,22 +196,22 @@ namespace MultasLectura.Services
         {
             double idealPorcentaje = 0.0015;
             double ideal = empleado.Leidos * idealPorcentaje;
-            hoja.Cells[$"G{numPrimeraCelda}"].Value = $"{ideal}";
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numPrimeraCelda}", $"{ideal}", TipoOpCelda.Value);
 
             if (double.TryParse(hoja.Cells[$"G{numPrimeraCelda}"].Value?.ToString(), out double valor))
             {
-                hoja.Cells[$"G{numPrimeraCelda}"].Value = (int)Math.Round(valor);
+                LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numPrimeraCelda}", (int)Math.Round(valor), TipoOpCelda.Value);
             }
             return ideal;
         }
 
         public void ColumnaIncXOpIdealH(ExcelWorksheet hoja, int numPrimeraCelda)
         {
-            hoja.Cells[$"H{numPrimeraCelda}"].Value = "0,0015";
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"H{numPrimeraCelda}", "0,0015", TipoOpCelda.Value);
 
             if (double.TryParse(hoja.Cells[$"H{numPrimeraCelda}"].Value?.ToString(), out double valor2))
             {
-                hoja.Cells[$"H{numPrimeraCelda}"].Value = valor2;
+                LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"H{numPrimeraCelda}", valor2, TipoOpCelda.Value);
             }
 
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"H{numPrimeraCelda}"]);
@@ -249,9 +221,9 @@ namespace MultasLectura.Services
         {
             double desvio = (ideal - empleado.Inconformidades) / totalIdeal;
 
-            hoja.Cells[$"I{numPrimeraCelda}"].Value = desvio;
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"I{numPrimeraCelda}", desvio, TipoOpCelda.Value);
             LibroExcelHelper.FormatoPorcentaje(hoja.Cells[$"I{numPrimeraCelda}"]);
-           
+
             return desvio;
         }
 

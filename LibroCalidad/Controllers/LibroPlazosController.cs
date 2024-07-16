@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controllers
+namespace MultasLectura.LibroCalidad.Controllers
 {
-    internal class LibroReclamosController
+    internal class LibroPlazosController
     {
     }
 }

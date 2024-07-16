@@ -1,4 +1,5 @@
 ﻿using Aspose.Cells;
+using MultasLectura.Enums;
 using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -56,6 +57,29 @@ namespace MultasLectura.Helpers
                 return "";
             }
 
+        }
+
+        static public void AsignarValorFormulaACelda<V>(ExcelWorksheet hoja, string celda, V valor, TipoOpCelda tipo)
+        {
+            ExcelRange rango = hoja.Cells[$"{celda}"];
+
+            switch (tipo)
+            {
+                case TipoOpCelda.Value:
+                    rango.Value = valor;
+                    break;
+                case TipoOpCelda.Formula:
+                    // if (valor is string formula)
+                    // {
+                    rango.Formula = valor!.ToString();
+                    // }
+                    // else
+                    // {
+                    //    rango.Value = valor;
+                    // }
+                    break;
+            }
+            // hoja.Cells[$"{celda}"].Value = valor;
         }
 
         static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, ColorModel color)

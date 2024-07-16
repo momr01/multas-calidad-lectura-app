@@ -1,7 +1,7 @@
 ﻿using Aspose.Cells;
 using Microsoft.Office.Interop.Excel;
 using MultasLectura.Helpers;
-using MultasLectura.Interfaces;
+using MultasLectura.LibroCalidad.Interfaces;
 using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Controllers
+namespace MultasLectura.LibroCalidad.Controllers
 {
     public class LibroCalidadController : ILibroCalidadController
     {
@@ -43,7 +43,7 @@ namespace MultasLectura.Controllers
                 string archCalXOperario = LibroExcelHelper.ValidarFormato(rutaCalXOper);
                 string archReclDetalles = LibroExcelHelper.ValidarFormato(rutaReclDetalles);
 
-                if (string.IsNullOrEmpty(archCalDetalles) || string.IsNullOrEmpty(archCalXOperario) 
+                if (string.IsNullOrEmpty(archCalDetalles) || string.IsNullOrEmpty(archCalXOperario)
                     || string.IsNullOrEmpty(archReclDetalles)
                     )
                 {
@@ -63,14 +63,16 @@ namespace MultasLectura.Controllers
                     }
 
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 LibroExcelHelper.MostrarMensaje(e.Message, true);
             }
-           
+
 
         }
 
-   
+
         private Dictionary<string, int> ReclamosPorTarifa(ExcelWorksheet hoja, int numeroColumna)
         {
             int contFilas = hoja.Dimension.Rows;
@@ -101,11 +103,11 @@ namespace MultasLectura.Controllers
                 ["t1"] = totalReclT1,
                 ["t2"] = totalReclT2
             };
-        } 
+        }
 
 
 
-    private void GenerarLibroCalidad(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion, string rutaGuardar)
+        private void GenerarLibroCalidad(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion, string rutaGuardar)
         {
             using ExcelPackage libroCalXOperario = new(new FileInfo(rutaCalXOper));
             ExcelWorksheet hojaBaseCalXOp = libroCalXOperario.Workbook.Worksheets[0];
@@ -137,7 +139,7 @@ namespace MultasLectura.Controllers
             LibroExcelHelper.ConvertirTextoANumero(rangoHojaCantXOperario);
 
             Dictionary<string, int> reclamosValores = new();
-            
+
             int numeroColumna = LibroExcelHelper.ObtenerNumeroColumna(hojaBaseReclDetalles, "desc_tar");
             if (numeroColumna != -1)
             {
@@ -147,24 +149,24 @@ namespace MultasLectura.Controllers
             {
                 throw new Exception();
             }
-       
+
             //Agregar contenido
             AgregarContenidoHojaResumen(hojaBaseCalDetalles, hojaResumen, rangoCalidadDetalles, _baremos, _metas, hojaBaseCalXOp, importeCertificacion, reclamosValores);
             AgregarContenidoHojaCuadros(hojaCuadros, rangoCalidadDetalles, rangoCalXOperario);
             AgregarContenidoHojaResLecturista(hojaCantXOperario, hojaBaseCalDetalles, hojaResLecturista);
-            
+
             //guardar libro calidad
             libroCalDetalles.SaveAs(new FileInfo(rutaGuardar));
 
         }
 
         private void AgregarContenidoHojaResumen(
-            ExcelWorksheet hojaBase, 
-            ExcelWorksheet hojaResumen, 
-            ExcelRange rango, 
-            BaremoModel baremos, 
-            MetaModel metas, 
-            ExcelWorksheet hojaCalXOperario, 
+            ExcelWorksheet hojaBase,
+            ExcelWorksheet hojaResumen,
+            ExcelRange rango,
+            BaremoModel baremos,
+            MetaModel metas,
+            ExcelWorksheet hojaCalXOperario,
             double importeCertificacion,
             Dictionary<string, int> reclamosValores
             )
@@ -172,7 +174,7 @@ namespace MultasLectura.Controllers
             _hojaResumenController.CrearTablaDinTipoEstado(hojaResumen, rango);
             Dictionary<string, double> totales = _hojaResumenController.CrearTablaMetodoLineal(hojaResumen, hojaBase, baremos);
             Dictionary<string, double> propInMasImpMetLineal = _hojaResumenController.CrearTablaTotales(hojaResumen, totales, reclamosValores, baremos, hojaCalXOperario, importeCertificacion);
-            _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen, propInMasImpMetLineal["propInconformidades"], propInMasImpMetLineal["totalMetLineal"],  importeCertificacion, metas);
+            _hojaResumenController.CrearTablaValorFinalMulta(hojaResumen, propInMasImpMetLineal["propInconformidades"], propInMasImpMetLineal["totalMetLineal"], importeCertificacion, metas);
             _hojaResumenController.CrearTablaBaremosMetas(hojaResumen, baremos, metas, propInMasImpMetLineal["propInconformidades"]);
             hojaResumen.Cells.AutoFitColumns();
             hojaResumen.Column(2).AutoFit();

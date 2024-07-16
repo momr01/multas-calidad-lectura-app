@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultasLectura.Interfaces
+namespace MultasLectura.LibroCalidad.Interfaces
 {
     public interface ICalidadHojaCuadrosController
     {
