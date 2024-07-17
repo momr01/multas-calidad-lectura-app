@@ -1,4 +1,8 @@
-﻿using MultasLectura.LibroPlazos.Interfaces;
+﻿using MultasLectura.Helpers;
+using MultasLectura.LibroCalidad.Controllers;
+using MultasLectura.LibroCalidad.Interfaces;
+using MultasLectura.LibroPlazos.Interfaces;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +13,43 @@ namespace MultasLectura.LibroPlazos.Controllers
 {
     public class LibroPlazosController : ILibroPlazosController
     {
-        public void GenerarLibroPlazos()
+        private readonly IPlazosHojaResumenController _hojaResumenController;
+
+        public LibroPlazosController()
         {
-            throw new NotImplementedException();
+            _hojaResumenController = new PlazosHojaResumenController();
+        }
+
+        public void GenerarLibroPlazos(string rutaPlazosDetalles, string rutaGuardar)
+        {
+            using ExcelPackage libroPlazosDetalles = new(new FileInfo(rutaPlazosDetalles));
+            ExcelWorksheet hojaBasePlazosDet = libroPlazosDetalles.Workbook.Worksheets[0];
+
+            //creamos hojas nuevas del libro
+            ExcelWorksheet hojaResumen = libroPlazosDetalles.Workbook.Worksheets.Add("Resumen");
+
+            //ubicacion de hojas
+            libroPlazosDetalles.Workbook.Worksheets.MoveBefore(hojaResumen.Name, hojaBasePlazosDet.Name);
+
+            //Obtener rangos de las hojas que utilizaremos
+            var rangoPlazosDetalles = hojaBasePlazosDet.Cells[hojaBasePlazosDet.Dimension.Address];
+
+            //Convertir a número la columna de la hoja plazos detalles
+            LibroExcelHelper.ConvertirTextoANumero(rangoPlazosDetalles);
+
+            //Agregar contenido
+            AgregarContenidoHojaResumen(hojaResumen, rangoPlazosDetalles);
+           
+
+            //guardar libro calidad
+            libroPlazosDetalles.SaveAs(new FileInfo(rutaGuardar));
+        }
+
+        private void AgregarContenidoHojaResumen(ExcelWorksheet hoja, ExcelRange rango)
+        {
+            _hojaResumenController.CrearTablaDinCertAtrasoTotal(hoja, rango);
+            _hojaResumenController.CrearTablaDatosTarifa(hoja);
+
         }
     }
 }

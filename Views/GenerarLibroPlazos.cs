@@ -2,6 +2,8 @@
 using MultasLectura.Helpers;
 using MultasLectura.LibroCalidad.Controllers;
 using MultasLectura.LibroCalidad.Interfaces;
+using MultasLectura.LibroPlazos.Controllers;
+using MultasLectura.LibroPlazos.Interfaces;
 using MultasLectura.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ namespace MultasLectura.Views
     public partial class GenerarLibroPlazos : Form
     {
         //private readonly ILibroCalidadController _calidadController;
+        private readonly ILibroPlazosController _plazosController;
         private readonly BaremoModel _baremos = new();
         private readonly MetaModel _metas = new();
 
@@ -26,6 +29,7 @@ namespace MultasLectura.Views
             InitializeComponent();
             ArchivoTextoHelper.VerificarExisteArchivoBaremos(_baremos);
             ArchivoTextoHelper.VerificarExisteArchivoMetas(_metas);
+            _plazosController = new LibroPlazosController();
             // _calidadController = new LibroCalidadController(_baremos!, _metas!);
             // _loaderForm = new Loader();
             ViewHelper.DragDropTextBox(txtRutaPlazosDetalles, txtRutaPlazosDetalles_DragEnter!, txtRutaPlazosDetalles_DragDrop!);
@@ -94,6 +98,11 @@ namespace MultasLectura.Views
 
                     if (rutasValidas.Count == rutas.Count + 1)
                     {
+                    _plazosController.GenerarLibroPlazos(
+                        LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.PlazosDetalle.ToString()),
+                         LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.Guardar.ToString())
+                        );
+
                     /* _calidadController.GenerarLibroCalidad(
                          LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.CalidadDetalles.ToString()),
                          LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.CalidadXOperario.ToString()),
