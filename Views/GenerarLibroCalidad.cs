@@ -18,6 +18,7 @@ using MultasLectura.LibroCalidad.Controllers;
 using MultasLectura.Views;
 using MultasLectura.Helpers;
 using MultasLectura.LibroCalidad.Interfaces;
+using MultasLectura.Enums;
 
 namespace MultasLectura
 {
@@ -27,7 +28,7 @@ namespace MultasLectura
         private readonly BaremoModel _baremos = new();
         private readonly MetaModel _metas = new();
 
-        private Loader _loaderForm;
+        //private Loader _loaderForm;
 
         public GenerarLibroCalidad()
         {
@@ -35,61 +36,12 @@ namespace MultasLectura
             ArchivoTextoHelper.VerificarExisteArchivoBaremos(_baremos);
             ArchivoTextoHelper.VerificarExisteArchivoMetas(_metas);
             _calidadController = new LibroCalidadController(_baremos!, _metas!);
-            _loaderForm = new Loader();
-            DragDropTextBoxes();
+           // _loaderForm = new Loader();
+            ViewHelper.DragDropTextBox(txtRutaCalidadDetalles, txtRutaCalidadDetalles_DragEnter!, txtRutaCalidadDetalles_DragDrop!);
+            ViewHelper.DragDropTextBox(txtRutaCalXOperarios, txtRutaCalXOperarios_DragEnter!, txtRutaCalXOperarios_DragDrop!);
+            ViewHelper.DragDropTextBox(txtRutaReclamosDetalles, txtRutaReclamosDetalles_DragEnter!, txtRutaReclamosDetalles_DragDrop!);
 
 
-
-        }
-
-        private void DragDropTextBoxes()
-        {
-            txtRutaCalidadDetalles.AllowDrop = true;
-            txtRutaCalXOperarios.AllowDrop = true;
-            txtRutaReclamosDetalles.AllowDrop = true;
-
-            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter!;
-            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop!;
-            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter!;
-            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop!;
-            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter!;
-            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop!;
-        }
-
-        private void DragDropTextBox(System.Windows.Forms.TextBox txt, DragEventHandler DragEnter, DragEventHandler DragDrop)
-        {
-            txt.AllowDrop = true;
-
-            txt.DragDrop += DragDrop;
-            txt.DragEnter += DragEnter;
-
-            /*txtRutaCalidadDetalles.AllowDrop = true;
-            txtRutaCalXOperarios.AllowDrop = true;
-            txtRutaReclamosDetalles.AllowDrop = true;
-
-            txtRutaCalidadDetalles.DragEnter += txtRutaCalidadDetalles_DragEnter!;
-            txtRutaCalidadDetalles.DragDrop += txtRutaCalidadDetalles_DragDrop!;
-            txtRutaCalXOperarios.DragEnter += txtRutaCalXOperarios_DragEnter!;
-            txtRutaCalXOperarios.DragDrop += txtRutaCalXOperarios_DragDrop!;
-            txtRutaReclamosDetalles.DragEnter += txtRutaReclamosDetalles_DragEnter!;
-            txtRutaReclamosDetalles.DragDrop += txtRutaReclamosDetalles_DragDrop!;*/
-
-        }
-
-        private void CargarDatosBaremos()
-        {
-            baremosT1.Text = _baremos.T1.ToString();
-            baremosT2.Text = _baremos.T2.ToString();
-            baremosT3.Text = _baremos.T3.ToString();
-            baremosAlturaT1.Text = _baremos.AlturaT1.ToString();
-            baremosAlturaT3.Text = _baremos.AlturaT3.ToString();
-
-        }
-
-        private void CargarDatosMetas()
-        {
-            meta1.Text = $"{_metas.Meta1 * 100}%";
-            meta2.Text = $"{_metas.Meta2 * 100}%";
 
         }
 
@@ -111,11 +63,25 @@ namespace MultasLectura
 
         private void GenerarLibroCalidad_Load(object sender, EventArgs e)
         {
-            CargarDatosBaremos();
-            CargarDatosMetas();
+            List<System.Windows.Forms.Label> labelsBaremos = new() {
+                baremosT1,
+                baremosT2,
+                baremosT3,
+                baremosAlturaT1,
+                baremosAlturaT3
+                };
+
+            List<System.Windows.Forms.Label> labelsMetas = new() {
+                meta1,
+                meta2
+                };
+
+
+            ViewHelper.CargarDatosBaremos(labelsBaremos, _baremos);
+          ViewHelper.CargarDatosMetas(labelsMetas, _metas);
         }
 
-        private void MostrarLoader()
+       /* private void MostrarLoader()
         {
             _loaderForm.StartPosition = FormStartPosition.CenterParent; // Aparece centrado respecto al formulario principal
             _loaderForm.Show(this);
@@ -124,7 +90,7 @@ namespace MultasLectura
         private void OcultarLoader()
         {
             _loaderForm.Hide();
-        }
+        }*/
 
         private void btnGenerarLibroFinal_Click(object sender, EventArgs e)
         {
@@ -135,9 +101,9 @@ namespace MultasLectura
 
             //  MessageBox.Show(txtRutaCalidadDetalles.Lines.FirstOrDefault().ToString());
 
-            string rutaCalDetalles = txtRutaCalidadDetalles.Lines.FirstOrDefault();
-            string rutaCalXOperario = txtRutaCalXOperarios.Lines.FirstOrDefault();
-            string rutaReclDetalles = txtRutaReclamosDetalles.Lines.FirstOrDefault();
+            string rutaCalDetalles = txtRutaCalidadDetalles.Lines.FirstOrDefault()!;
+            string rutaCalXOperario = txtRutaCalXOperarios.Lines.FirstOrDefault()!;
+            string rutaReclDetalles = txtRutaReclamosDetalles.Lines.FirstOrDefault()!;
 
 
             if (string.IsNullOrEmpty(rutaCalDetalles) || string.IsNullOrEmpty(rutaCalXOperario) || string.IsNullOrEmpty(rutaReclDetalles)
@@ -149,7 +115,27 @@ namespace MultasLectura
             {
                 if (double.TryParse(txtImporteCertificacion.Text, out double importeCertificacion))
                 {
-                    _calidadController.CargarLibroExcel(rutaCalDetalles, rutaCalXOperario, rutaReclDetalles, importeCertificacion);
+ 
+                    List<Dictionary<string, string>> rutas = new()
+                    {
+                       new() { [RutaArchivo.CalidadDetalles.ToString()] = rutaCalDetalles },
+                        new() { [RutaArchivo.CalidadXOperario.ToString()] = rutaCalXOperario },
+                        new() { [RutaArchivo.ReclamosDetalles.ToString()] = rutaReclDetalles }
+                    };
+
+                    List<Dictionary<string, string>> rutasValidas =  LibroExcelHelper.ProcesarPathArchivos(rutas, "+ Calidad_Lectura.xlsx");
+
+                    if(rutasValidas.Count == rutas.Count + 1)
+                    {
+                        _calidadController.GenerarLibroCalidad(
+                            LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.CalidadDetalles.ToString()),
+                            LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.CalidadXOperario.ToString()),
+                            LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.ReclamosDetalles.ToString()),
+                            importeCertificacion,
+                           LibroExcelHelper.ObtenerValorPorClave(rutasValidas, RutaArchivo.Guardar.ToString())
+
+                            );
+                    }
                 }
                 else
                 {
@@ -170,63 +156,37 @@ namespace MultasLectura
 
         }
 
+       
+
         private void txtRutaCalidadDetalles_DragDrop(object sender, DragEventArgs e)
         {
-            AgregarRutaATextBox(e, txtRutaCalidadDetalles);
+            ViewHelper.AgregarRutaATextBox(e, txtRutaCalidadDetalles);
         }
 
         private void txtRutaCalXOperarios_DragDrop(object sender, DragEventArgs e)
         {
-            AgregarRutaATextBox(e, txtRutaCalXOperarios);
+            ViewHelper.AgregarRutaATextBox(e, txtRutaCalXOperarios);
         }
 
         private void txtRutaReclamosDetalles_DragDrop(object sender, DragEventArgs e)
         {
-            AgregarRutaATextBox(e, txtRutaReclamosDetalles);
-        }
-
-        private void AgregarRutaATextBox(DragEventArgs e, System.Windows.Forms.TextBox txt)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                foreach (string file in files)
-                {
-                    txt.AppendText(file + Environment.NewLine);
-                }
-
-
-
-            }
-        }
-
-        private void EventoDragEnter(DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effect = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-            }
+            ViewHelper.AgregarRutaATextBox(e, txtRutaReclamosDetalles);
         }
 
         private void txtRutaCalidadDetalles_DragEnter(object sender, DragEventArgs e)
         {
-            EventoDragEnter(e);
+            ViewHelper.EventoDragEnter(e);
         }
 
         private void txtRutaCalXOperarios_DragEnter(object sender, DragEventArgs e)
         {
-            EventoDragEnter(e);
+            ViewHelper.EventoDragEnter(e);
 
         }
 
         private void txtRutaReclamosDetalles_DragEnter(object sender, DragEventArgs e)
         {
-            EventoDragEnter(e);
+            ViewHelper.EventoDragEnter(e);
 
         }
     }

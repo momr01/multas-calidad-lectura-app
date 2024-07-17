@@ -67,6 +67,7 @@
             btnPlazosDetalles.TabIndex = 1;
             btnPlazosDetalles.Text = "Cargar Archivo Plazos Detalles";
             btnPlazosDetalles.UseVisualStyleBackColor = false;
+            btnPlazosDetalles.Click += btnPlazosDetalles_Click;
             // 
             // txtRutaDiasRegl
             // 
@@ -111,6 +112,7 @@
             btnGenerarLibroFinal.TabIndex = 5;
             btnGenerarLibroFinal.Text = "GENERAR ARCHIVO PLAZOS";
             btnGenerarLibroFinal.UseVisualStyleBackColor = false;
+            btnGenerarLibroFinal.Click += btnGenerarLibroFinal_Click;
             // 
             // groupBox2
             // 
@@ -232,6 +234,7 @@
             Controls.Add(btnGenerarLibroFinal);
             Name = "GenerarLibroPlazos";
             Text = "Generar Libro Plazos";
+            Load += GenerarLibroPlazos_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

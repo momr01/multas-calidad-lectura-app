@@ -2,6 +2,7 @@
 using MultasLectura.Enums;
 using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
@@ -59,6 +60,80 @@ namespace MultasLectura.Helpers
 
         }
 
+        static public string ObtenerValorPorClave(List<Dictionary<string, string>> lista, string clave)
+        {
+            foreach (var diccionario in lista)
+            {
+                if (diccionario.ContainsKey(clave))
+                {
+                    return diccionario[clave];
+                }
+            }
+            return ""; 
+        }
+
+        static public List<Dictionary<string, string>> ProcesarPathArchivos(
+            List<Dictionary<string, string>> rutas,
+            string nombreXDefecto
+            )
+        {
+            List<Dictionary<string, string>> rutasFinales = new();
+
+            try
+            {
+                for (int i = 0; i < rutas.Count; i++)
+                {
+                    var clave = rutas[i].Keys.FirstOrDefault();
+
+                    string rutaValida = LibroExcelHelper.ValidarFormato(rutas[i][clave!]);
+
+                    if (!string.IsNullOrEmpty(rutaValida))
+                    {
+                        Dictionary<string, string> rutaNueva = new()
+                        {
+                            { clave!, rutaValida }
+                        };
+
+                        rutasFinales.Add(rutaNueva);
+                          
+                    }
+                }
+
+
+                if (rutas.Count != rutasFinales.Count)
+                {
+                    LibroExcelHelper.MostrarMensaje("Error al cargar los archivos. Intente nuevamente.", true);
+                } else
+                {
+                    string rutaArchivo = LibroExcelHelper.DialogoGuardarArchivo(nombreXDefecto);
+
+                    if (string.IsNullOrEmpty(rutaArchivo))
+                    {
+                        LibroExcelHelper.MostrarMensaje("Tarea cancelada por el usuario.", true);
+                    }
+                    else
+                    {
+                        Dictionary<string, string> rutaNueva = new()
+                        {
+                            { RutaArchivo.Guardar.ToString(), rutaArchivo }
+                        };
+
+                        rutasFinales.Add(rutaNueva);
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                LibroExcelHelper.MostrarMensaje(e.Message, true);
+            }
+
+            return rutasFinales;
+
+
+        }
+
         static public void AsignarValorFormulaACelda<V>(ExcelWorksheet hoja, string celda, V valor, TipoOpCelda tipo)
         {
             ExcelRange rango = hoja.Cells[$"{celda}"];
@@ -69,17 +144,9 @@ namespace MultasLectura.Helpers
                     rango.Value = valor;
                     break;
                 case TipoOpCelda.Formula:
-                    // if (valor is string formula)
-                    // {
                     rango.Formula = valor!.ToString();
-                    // }
-                    // else
-                    // {
-                    //    rango.Value = valor;
-                    // }
                     break;
             }
-            // hoja.Cells[$"{celda}"].Value = valor;
         }
 
         static public void ColorFondoLetra(ExcelWorksheet hoja, char letraCelda, int numCelda1, ColorModel color)
@@ -262,7 +329,7 @@ namespace MultasLectura.Helpers
             }
         }
 
-        static public string DialogoGuardarArchivo()
+        static public string DialogoGuardarArchivo(string nombreXDefecto)
         {
             string rutaArchivo = string.Empty;
 
@@ -271,7 +338,8 @@ namespace MultasLectura.Helpers
             guardar.FilterIndex = 1;
             guardar.RestoreDirectory = true;
 
-            guardar.FileName = "+ Calidad_Lectura.xlsx";
+            //guardar.FileName = "+ Calidad_Lectura.xlsx";
+            guardar.FileName = nombreXDefecto;
 
             if (guardar.ShowDialog() == DialogResult.OK)
             {

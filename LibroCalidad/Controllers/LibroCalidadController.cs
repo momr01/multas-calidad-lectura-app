@@ -35,79 +35,7 @@ namespace MultasLectura.LibroCalidad.Controllers
             _metas = metas;
         }
 
-        public void CargarLibroExcel(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion)
-        {
-            try
-            {
-                string archCalDetalles = LibroExcelHelper.ValidarFormato(rutaCalDetalles);
-                string archCalXOperario = LibroExcelHelper.ValidarFormato(rutaCalXOper);
-                string archReclDetalles = LibroExcelHelper.ValidarFormato(rutaReclDetalles);
-
-                if (string.IsNullOrEmpty(archCalDetalles) || string.IsNullOrEmpty(archCalXOperario)
-                    || string.IsNullOrEmpty(archReclDetalles)
-                    )
-                {
-                    LibroExcelHelper.MostrarMensaje("Error al cargar los archivos. Intente nuevamente.", true);
-                }
-                else
-                {
-                    string rutaArchivo = LibroExcelHelper.DialogoGuardarArchivo();
-
-                    if (string.IsNullOrEmpty(rutaArchivo))
-                    {
-                        LibroExcelHelper.MostrarMensaje("Tarea cancelada por el usuario.", true);
-                    }
-                    else
-                    {
-                        GenerarLibroCalidad(archCalDetalles, archCalXOperario, archReclDetalles, importeCertificacion, rutaArchivo);
-                    }
-
-                }
-            }
-            catch (Exception e)
-            {
-                LibroExcelHelper.MostrarMensaje(e.Message, true);
-            }
-
-
-        }
-
-
-        private Dictionary<string, int> ReclamosPorTarifa(ExcelWorksheet hoja, int numeroColumna)
-        {
-            int contFilas = hoja.Dimension.Rows;
-
-            int totalReclT1 = 0;
-            int totalReclT2 = 0;
-
-            for (int row = 1; row <= contFilas; row++)
-            {
-                object cellValue = hoja.Cells[row, numeroColumna].Value;
-                if (cellValue != null)
-                {
-
-                    if (cellValue.ToString()!.ToLower().Contains("t1"))
-                    {
-                        totalReclT1++;
-                    }
-                    else if (cellValue.ToString()!.ToLower().Contains("t2"))
-                    {
-                        totalReclT2++;
-                    }
-
-                }
-            }
-
-            return new()
-            {
-                ["t1"] = totalReclT1,
-                ["t2"] = totalReclT2
-            };
-        }
-
-
-
-        private void GenerarLibroCalidad(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion, string rutaGuardar)
+        public void GenerarLibroCalidad(string rutaCalDetalles, string rutaCalXOper, string rutaReclDetalles, double importeCertificacion, string rutaGuardar)
         {
             using ExcelPackage libroCalXOperario = new(new FileInfo(rutaCalXOper));
             ExcelWorksheet hojaBaseCalXOp = libroCalXOperario.Workbook.Worksheets[0];
@@ -159,6 +87,43 @@ namespace MultasLectura.LibroCalidad.Controllers
             libroCalDetalles.SaveAs(new FileInfo(rutaGuardar));
 
         }
+
+
+        private Dictionary<string, int> ReclamosPorTarifa(ExcelWorksheet hoja, int numeroColumna)
+        {
+            int contFilas = hoja.Dimension.Rows;
+
+            int totalReclT1 = 0;
+            int totalReclT2 = 0;
+
+            for (int row = 1; row <= contFilas; row++)
+            {
+                object cellValue = hoja.Cells[row, numeroColumna].Value;
+                if (cellValue != null)
+                {
+
+                    if (cellValue.ToString()!.ToLower().Contains("t1"))
+                    {
+                        totalReclT1++;
+                    }
+                    else if (cellValue.ToString()!.ToLower().Contains("t2"))
+                    {
+                        totalReclT2++;
+                    }
+
+                }
+            }
+
+            return new()
+            {
+                ["t1"] = totalReclT1,
+                ["t2"] = totalReclT2
+            };
+        }
+
+
+
+       
 
         private void AgregarContenidoHojaResumen(
             ExcelWorksheet hojaBase,
