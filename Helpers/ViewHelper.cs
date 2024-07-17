@@ -48,11 +48,11 @@ namespace MultasLectura.Helpers
 
         static public void CargarDatosBaremos(List<Label> label, BaremoModel baremos)
         {
-            label[0].Text = baremos.T1.ToString();
-            label[1].Text = baremos.T2.ToString();
-            label[2].Text = baremos.T3.ToString();
-            label[3].Text = baremos.AlturaT1.ToString();
-            label[4].Text = baremos.AlturaT3.ToString();
+            label[0].Text = $"$ {baremos.T1:N2}";
+            label[1].Text = $"$ {baremos.T2:N2}";
+            label[2].Text = $"$ {baremos.T3:N2}";
+            label[3].Text = $"$ {baremos.AlturaT1:N2}"; ;
+            label[4].Text = $"$ {baremos.AlturaT3:N2}";
 
         }
 
