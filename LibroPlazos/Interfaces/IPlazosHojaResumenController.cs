@@ -15,7 +15,7 @@ namespace MultasLectura.LibroPlazos.Interfaces
         Dictionary<string, double> CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion);
         void CrearTablaValorFinalMulta(ExcelWorksheet hoja, double propInconformidades, double importeTotalMetLineal, double importeTotalCertificacion, MetaModel metas);
         void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas, double propInconformidades);*/
-        void CrearTablaDatosTarifa(ExcelWorksheet hoja);
+        void CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles);
         void CrearTablaImportesFinales();
     }
 }

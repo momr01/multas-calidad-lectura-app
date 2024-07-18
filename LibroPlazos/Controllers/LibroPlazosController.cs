@@ -38,17 +38,17 @@ namespace MultasLectura.LibroPlazos.Controllers
             LibroExcelHelper.ConvertirTextoANumero(rangoPlazosDetalles);
 
             //Agregar contenido
-            AgregarContenidoHojaResumen(hojaResumen, rangoPlazosDetalles);
+            AgregarContenidoHojaResumen(hojaResumen, hojaBasePlazosDet, rangoPlazosDetalles);
            
 
             //guardar libro calidad
             libroPlazosDetalles.SaveAs(new FileInfo(rutaGuardar));
         }
 
-        private void AgregarContenidoHojaResumen(ExcelWorksheet hoja, ExcelRange rango)
+        private void AgregarContenidoHojaResumen(ExcelWorksheet hojaResumen,ExcelWorksheet hojaPlazosDetalles, ExcelRange rango)
         {
-            _hojaResumenController.CrearTablaDinCertAtrasoTotal(hoja, rango);
-            _hojaResumenController.CrearTablaDatosTarifa(hoja);
+            _hojaResumenController.CrearTablaDinCertAtrasoTotal(hojaResumen, rango);
+            _hojaResumenController.CrearTablaDatosPorTarifa(hojaResumen, hojaPlazosDetalles);
 
         }
     }
