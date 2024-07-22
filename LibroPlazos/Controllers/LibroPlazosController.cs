@@ -2,6 +2,7 @@
 using MultasLectura.LibroCalidad.Controllers;
 using MultasLectura.LibroCalidad.Interfaces;
 using MultasLectura.LibroPlazos.Interfaces;
+using MultasLectura.Models;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,13 @@ namespace MultasLectura.LibroPlazos.Controllers
     public class LibroPlazosController : ILibroPlazosController
     {
         private readonly IPlazosHojaResumenController _hojaResumenController;
+        private readonly BaremoModel _baremos;
 
-        public LibroPlazosController()
+        public LibroPlazosController(BaremoModel baremos)
         {
-            _hojaResumenController = new PlazosHojaResumenController();
+            _baremos = baremos;
+            _hojaResumenController = new PlazosHojaResumenController(_baremos);
+            
         }
 
         public void GenerarLibroPlazos(string rutaPlazosDetalles, string rutaGuardar)

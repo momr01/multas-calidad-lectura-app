@@ -29,7 +29,7 @@ namespace MultasLectura.Views
             InitializeComponent();
             ArchivoTextoHelper.VerificarExisteArchivoBaremos(_baremos);
             ArchivoTextoHelper.VerificarExisteArchivoMetas(_metas);
-            _plazosController = new LibroPlazosController();
+            _plazosController = new LibroPlazosController(_baremos);
             // _calidadController = new LibroCalidadController(_baremos!, _metas!);
             // _loaderForm = new Loader();
             ViewHelper.DragDropTextBox(txtRutaPlazosDetalles, txtRutaPlazosDetalles_DragEnter!, txtRutaPlazosDetalles_DragDrop!);

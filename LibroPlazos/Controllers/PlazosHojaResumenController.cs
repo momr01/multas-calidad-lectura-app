@@ -103,14 +103,20 @@ namespace MultasLectura.LibroPlazos.Controllers
             char letra4 = ObtenerLetraSiguiente(letra3);
             string cuarLetra = letra4.ToString().ToUpper();
 
-            hojaResumen.Cells[$"{primLetra}1"].Value = tarifa.Encabezado.ToUpper();
-
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}1", tarifa.Encabezado.ToUpper(), Enums.TipoOpCelda.Value);
             hojaResumen.Cells[$"{primLetra}1:{cuarLetra}1"].Merge = true;
-            hojaResumen.Cells[$"{primLetra}2"].Value = "FTL";
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}2", "FTL", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{segLetra}2", "k", Enums.TipoOpCelda.Value);
+
+            // hojaResumen.Cells[$"{primLetra}1"].Value = tarifa.Encabezado.ToUpper();
+
+           
+            //hojaResumen.Cells[$"{primLetra}2"].Value = "FTL";
             
-            hojaResumen.Cells[$"{segLetra}2"].Value = "k";
+           // hojaResumen.Cells[$"{segLetra}2"].Value = "k";
             LibroExcelHelper.FondoSolido(hojaResumen.Cells[$"{primLetra}2:{segLetra}2"], Color.FromArgb(1, 204, 255, 255 ));
-            hojaResumen.Cells[$"{tercLetra}2"].Value = "Qij";
+           // hojaResumen.Cells[$"{tercLetra}2"].Value = "Qij";
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}2", "Qij", Enums.TipoOpCelda.Value);
             hojaResumen.Cells[$"{tercLetra}2:{cuarLetra}2"].Merge = true;
             LibroExcelHelper.FondoSolido(hojaResumen.Cells[$"{tercLetra}2"], Color.FromArgb(1, 255, 0, 0));
 
@@ -127,7 +133,10 @@ namespace MultasLectura.LibroPlazos.Controllers
 
             }
 
-          
+
+            int totalCantidades = 0;
+            int totalEnPlazo = 0;
+            int totalFueraDePlazo = 0;
 
 
 
@@ -136,6 +145,7 @@ namespace MultasLectura.LibroPlazos.Controllers
                 hojaResumen.Cells[$"{primLetra}{numFila}"].Value = ftl;
 
                 int cantidad = CalcularCantAtrasos(hojaReclDetalles, ftl, tarifa.Descripcion);
+                totalCantidades += cantidad;
 
                 hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = cantidad;
 
@@ -148,6 +158,14 @@ namespace MultasLectura.LibroPlazos.Controllers
                 CargarDatosColK(ftl, hojaResumen, numFila, segLetra);
 
                 hojaResumen.Cells[$"{tercLetra}{numFila}:{cuarLetra}{numFila}"].Merge = true;
+
+                if(ftl >= -3 && ftl <= 1)
+                {
+                    totalEnPlazo += cantidad;
+                } else
+                {
+                    totalFueraDePlazo += cantidad;
+                }
 
 
 
@@ -165,18 +183,44 @@ namespace MultasLectura.LibroPlazos.Controllers
                  "Certificado", "Valor de Lectura", "Dentro Plazo", "Bonificación"
              };*/
 
-            List<double> dentroPlazo = new() { 41, 105000 };
+            List<double> dentroPlazo = new() { (double)totalEnPlazo/totalCantidades, double.Parse(totalEnPlazo.ToString()) };
+            List<double> bonificacion = new() { 0,  0 };
 
-            Dictionary<string, Generics> valoresTabla2 = new();
-            valoresTabla2.Add("Certificado", new Generics(78000000));
-            valoresTabla2.Add("Valor de Lectura", new Generics(tarifa.Baremos));
-            valoresTabla2.Add("Dentro Plazo", new Generics(dentroPlazo));
-            valoresTabla2.Add("Bonificación", new Generics(566));
-
-
-            for (int  i = 0; i < 4; i++)
+            Dictionary<string, Generics> valoresTabla2 = new()
             {
-               // hojaResumen.Cells[$"{primLetra}{numFila}"].Value = headersTabla2[i];
+                { "Certificado", new Generics((double)totalCantidades*tarifa.Baremos) },
+                { "Valor de Lectura", new Generics(tarifa.Baremos) },
+                { "Dentro Plazo", new Generics(dentroPlazo) },
+                { "Bonificación", new Generics(bonificacion) }
+            };
+
+            var keys = valoresTabla2.Keys;
+
+            for (int  i = 0; i < valoresTabla2.Count; i++)
+            {
+                var valor = valoresTabla2[keys.ElementAt(i)].Value;
+
+                // hojaResumen.Cells[$"{primLetra}{numFila}"].Value = headersTabla2[i];
+                hojaResumen.Cells[$"{primLetra}{numFila}"].Value = keys.ElementAt(i);
+
+                if (valor is double)
+                {
+                    //double valorD = double.Parse(valor.ToString()!);
+                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = valoresTabla2[keys.ElementAt(i)].GetValue<double>();
+                } else if(valor is int)
+                {
+                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = valoresTabla2[keys.ElementAt(i)].GetValue<int>();
+                } else if(valor is List<double>)
+                {
+                    List<double> lista = valoresTabla2[keys.ElementAt(i)].GetValue<List<double>>();
+                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = lista[0];
+                    hojaResumen.Cells[$"{cuarLetra}{numFila}"].Value = lista[1];
+
+                } else
+                {
+                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = "holiiis";
+                }
+               
                 hojaResumen.Cells[$"{primLetra}{numFila}:{segLetra}{numFila}"].Merge = true;
                 numFila++;
             }
