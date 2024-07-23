@@ -1,4 +1,5 @@
 ﻿using Aspose.Cells;
+using MathNet.Numerics.Distributions;
 using MultasLectura.Enums;
 using MultasLectura.Models;
 using NPOI.HSSF.UserModel;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace MultasLectura.Helpers
 {
@@ -156,6 +158,17 @@ namespace MultasLectura.Helpers
             hoja.Cells[$"{letraCelda.ToString().ToUpper()}{numCelda1}"].Style.Font.Color.SetColor(color.Letra);
         }
 
+        static public void FormatoMergeCelda(ExcelWorksheet hoja, string rango)
+        {
+            hoja.Cells[rango].Merge = true;
+        }
+
+        static public void CentrarContenidoCelda(ExcelWorksheet hoja, string rango)
+        {
+            hoja.Cells[rango].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            hoja.Cells[rango].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+        }
+
         static public void AplicarBordeFinoARango(ExcelRangeBase rango)
         {
             rango.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -170,6 +183,37 @@ namespace MultasLectura.Helpers
             rango.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
             rango.Style.Border.Left.Style = ExcelBorderStyle.Thick;
             rango.Style.Border.Right.Style = ExcelBorderStyle.Thick;
+        }
+
+        static public void AplicarBordeParcialARango(ExcelWorksheet hoja, string rango, TipoBordeParcial tipo)
+        {
+            ExcelRange rangoFinal = hoja.Cells[rango];
+
+            switch (tipo)
+            {
+                case TipoBordeParcial.SupDerIzq:
+                    {
+                        rangoFinal.Style.Border.Top.Style = ExcelBorderStyle.Thick;
+                        rangoFinal.Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                        rangoFinal.Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                    } 
+                   
+                    break;
+                case TipoBordeParcial.CentroDerIzq:
+                    {
+                        rangoFinal.Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                        rangoFinal.Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                    }
+                    break;
+                case TipoBordeParcial.InfDerIzq:
+                    {
+                        rangoFinal.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+                        rangoFinal.Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                        rangoFinal.Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                    }
+                    break;
+            }
+           
         }
 
         static public void FormatoMoneda(ExcelRange rango)

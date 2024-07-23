@@ -104,9 +104,11 @@ namespace MultasLectura.LibroPlazos.Controllers
             string cuarLetra = letra4.ToString().ToUpper();
 
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}1", tarifa.Encabezado.ToUpper(), Enums.TipoOpCelda.Value);
-            hojaResumen.Cells[$"{primLetra}1:{cuarLetra}1"].Merge = true;
+          //  hojaResumen.Cells[$"{primLetra}1:{cuarLetra}1"].Merge = true;
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}2", "FTL", Enums.TipoOpCelda.Value);
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{segLetra}2", "k", Enums.TipoOpCelda.Value);
+
+            LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{primLetra}1:{cuarLetra}1");
 
             // hojaResumen.Cells[$"{primLetra}1"].Value = tarifa.Encabezado.ToUpper();
 
@@ -117,7 +119,8 @@ namespace MultasLectura.LibroPlazos.Controllers
             LibroExcelHelper.FondoSolido(hojaResumen.Cells[$"{primLetra}2:{segLetra}2"], Color.FromArgb(1, 204, 255, 255 ));
            // hojaResumen.Cells[$"{tercLetra}2"].Value = "Qij";
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}2", "Qij", Enums.TipoOpCelda.Value);
-            hojaResumen.Cells[$"{tercLetra}2:{cuarLetra}2"].Merge = true;
+            LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{tercLetra}2:{cuarLetra}2");
+           // hojaResumen.Cells[$"{tercLetra}2:{cuarLetra}2"].Merge = true;
             LibroExcelHelper.FondoSolido(hojaResumen.Cells[$"{tercLetra}2"], Color.FromArgb(1, 255, 0, 0));
 
             LibroExcelHelper.AplicarBordeGruesoARango(hojaResumen.Cells[$"{primLetra}1:{cuarLetra}2"]);
@@ -142,24 +145,28 @@ namespace MultasLectura.LibroPlazos.Controllers
 
             foreach (int ftl in ftlLista)
             {
-                hojaResumen.Cells[$"{primLetra}{numFila}"].Value = ftl;
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila}", ftl, Enums.TipoOpCelda.Value);
+               // hojaResumen.Cells[$"{primLetra}{numFila}"].Value = ftl;
 
                 int cantidad = CalcularCantAtrasos(hojaReclDetalles, ftl, tarifa.Descripcion);
                 totalCantidades += cantidad;
 
-                hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = cantidad;
+               // hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = cantidad;
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", cantidad, Enums.TipoOpCelda.Value);
+
 
                 ColorearRangoSegunNum(ftl, hojaResumen, numFila, primLetra, tercLetra);
 
-                AplicarBordeARango(numFila, numFilaInicial, ftlLista, hojaResumen, tarifa.LetraInicial);
-                AplicarBordeARango(numFila, numFilaInicial, ftlLista, hojaResumen, letra2);
-                AplicarBordeARango(numFila, numFilaInicial, ftlLista, hojaResumen, letra3);
+                AplicarBordeParcialARango(numFila, numFilaInicial, ftlLista, hojaResumen, tarifa.LetraInicial);
+                AplicarBordeParcialARango(numFila, numFilaInicial, ftlLista, hojaResumen, letra2);
+                AplicarBordeParcialARango(numFila, numFilaInicial, ftlLista, hojaResumen, letra3);
 
                 CargarDatosColK(ftl, hojaResumen, numFila, segLetra);
 
-                hojaResumen.Cells[$"{tercLetra}{numFila}:{cuarLetra}{numFila}"].Merge = true;
+               // hojaResumen.Cells[$"{tercLetra}{numFila}:{cuarLetra}{numFila}"].Merge = true;
+                LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{tercLetra}{numFila}:{cuarLetra}{numFila}");
 
-                if(ftl >= -3 && ftl <= 1)
+                if (ftl >= -3 && ftl <= 1)
                 {
                     totalEnPlazo += cantidad;
                 } else
@@ -175,20 +182,26 @@ namespace MultasLectura.LibroPlazos.Controllers
             }
 
             // LibroExcelHelper.AplicarBordeGruesoARango(hojaResumen.Cells[$"A{numFilaInicial}:A{numFila}"]);
-            hojaResumen.Cells[$"{primLetra}1:{cuarLetra}{numFila - 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            hojaResumen.Cells[$"{primLetra}1:{cuarLetra}{numFila - 1}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+         //   hojaResumen.Cells[$"{primLetra}1:{cuarLetra}{numFila - 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+          //  hojaResumen.Cells[$"{primLetra}1:{cuarLetra}{numFila - 1}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            LibroExcelHelper.CentrarContenidoCelda(hojaResumen, $"{primLetra}1:{cuarLetra}{numFila - 1}");
 
             /* List<string> headersTabla2 = new()
              {
                  "Certificado", "Valor de Lectura", "Dentro Plazo", "Bonificación"
              };*/
 
-            List<double> dentroPlazo = new() { (double)totalEnPlazo/totalCantidades, double.Parse(totalEnPlazo.ToString()) };
-            List<double> bonificacion = new() { 0,  0 };
+            double porcentajeDentroPlazo = (double)totalEnPlazo / totalCantidades;
+
+            double bonifica = porcentajeDentroPlazo >= 0.7 ? 1 : 0;
+            double totalImpCert = (double)totalCantidades * tarifa.Baremos;
+
+            List<double> dentroPlazo = new() { porcentajeDentroPlazo, double.Parse(totalEnPlazo.ToString()) };
+            List<double> bonificacion = new() { bonifica,  0 };
 
             Dictionary<string, Generics> valoresTabla2 = new()
             {
-                { "Certificado", new Generics((double)totalCantidades*tarifa.Baremos) },
+                { "Certificado", new Generics( totalImpCert) },
                 { "Valor de Lectura", new Generics(tarifa.Baremos) },
                 { "Dentro Plazo", new Generics(dentroPlazo) },
                 { "Bonificación", new Generics(bonificacion) }
@@ -201,29 +214,85 @@ namespace MultasLectura.LibroPlazos.Controllers
                 var valor = valoresTabla2[keys.ElementAt(i)].Value;
 
                 // hojaResumen.Cells[$"{primLetra}{numFila}"].Value = headersTabla2[i];
-                hojaResumen.Cells[$"{primLetra}{numFila}"].Value = keys.ElementAt(i);
+              //  hojaResumen.Cells[$"{primLetra}{numFila}"].Value = keys.ElementAt(i);
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila}", keys.ElementAt(i), Enums.TipoOpCelda.Value);
 
                 if (valor is double)
                 {
                     //double valorD = double.Parse(valor.ToString()!);
-                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = valoresTabla2[keys.ElementAt(i)].GetValue<double>();
+                    //  hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = valoresTabla2[keys.ElementAt(i)].GetValue<double>();
+                    LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", valoresTabla2[keys.ElementAt(i)].GetValue<double>(), 
+                        Enums.TipoOpCelda.Value);
+                    LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{tercLetra}{numFila}:{cuarLetra}{numFila}");
                 } else if(valor is int)
                 {
-                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = valoresTabla2[keys.ElementAt(i)].GetValue<int>();
+                    LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", valoresTabla2[keys.ElementAt(i)].GetValue<int>(), 
+                        Enums.TipoOpCelda.Value);
+                    LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{tercLetra}{numFila}:{cuarLetra}{numFila}");
                 } else if(valor is List<double>)
                 {
                     List<double> lista = valoresTabla2[keys.ElementAt(i)].GetValue<List<double>>();
-                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = lista[0];
-                    hojaResumen.Cells[$"{cuarLetra}{numFila}"].Value = lista[1];
+                    if (i == 3)
+                    {
+                        string textoBonifica = "No Bonifica";
+                        double importeBonif = 0;
+                        ColorModel colores = new("no bonifica", Color.Red, Color.White);
+
+                        if (lista[0] == 1)
+                        {
+                            textoBonifica = "Bonifica";
+                            importeBonif = (0.1 * totalImpCert * ((porcentajeDentroPlazo - 0.7)/0.3));
+                            colores.Nombre = textoBonifica;
+                            colores.Fondo = Color.FromArgb(1, 204, 255, 204);
+                            colores.Letra = Color.Black;
+                        } 
+
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", textoBonifica,
+                            Enums.TipoOpCelda.Value);
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{cuarLetra}{numFila}", importeBonif,
+                            Enums.TipoOpCelda.Value);
+                        LibroExcelHelper.ColorFondoLetra(hojaResumen, letra3, numFila, colores);
+
+                    } else
+                    {
+                        
+                        // hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = lista[0];
+                        //hojaResumen.Cells[$"{cuarLetra}{numFila}"].Value = lista[1];
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", lista[0],
+                            Enums.TipoOpCelda.Value);
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{cuarLetra}{numFila}", lista[1],
+                           Enums.TipoOpCelda.Value);
+                    }
+                   
 
                 } else
                 {
-                    hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = "holiiis";
+                    // hojaResumen.Cells[$"{tercLetra}{numFila}"].Value = "holiiis";
+                    LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", 0,
+                        Enums.TipoOpCelda.Value);
+                    LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{tercLetra}{numFila}:{cuarLetra}{numFila}");
+
                 }
                
-                hojaResumen.Cells[$"{primLetra}{numFila}:{segLetra}{numFila}"].Merge = true;
+              //  hojaResumen.Cells[$"{primLetra}{numFila}:{segLetra}{numFila}"].Merge = true;
+                LibroExcelHelper.FormatoMergeCelda(hojaResumen, $"{primLetra}{numFila}:{segLetra}{numFila}");
+
+                if(i == 0 || i==1)
+                {
+                    LibroExcelHelper.FormatoMoneda(hojaResumen.Cells[$"{tercLetra}{numFila}"]);
+
+                } else if(i== 2)
+                {
+                    LibroExcelHelper.FormatoPorcentaje(hojaResumen.Cells[$"{tercLetra}{numFila}"]);
+                    //LibroExcelHelper.MIles
+                } else
+                {
+                    LibroExcelHelper.FormatoMoneda(hojaResumen.Cells[$"{cuarLetra}{numFila}"]);
+                }
                 numFila++;
             }
+
+           
 
           
 
@@ -233,41 +302,50 @@ namespace MultasLectura.LibroPlazos.Controllers
         {
             if (ftl <= -3)
             {
-                hojaResumen.Cells[$"{letra}{numFila}"].Value = (ftl + 3) * -1;
+               // hojaResumen.Cells[$"{letra}{numFila}"].Value = (ftl + 3) * -1;
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{letra}{numFila}", (ftl + 3) * -1,
+                         Enums.TipoOpCelda.Value);
+
             }
             else if (ftl >= 2)
             {
-                hojaResumen.Cells[$"{letra}{numFila}"].Value = ftl - 1;
+               // hojaResumen.Cells[$"{letra}{numFila}"].Value = ftl - 1;
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{letra}{numFila}", ftl - 1,
+                        Enums.TipoOpCelda.Value);
             }
             else
             {
-                hojaResumen.Cells[$"{letra}{numFila}"].Value = 0;
+                LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{letra}{numFila}", 0, Enums.TipoOpCelda.Value);
             }
         }
 
-        private void AplicarBordeARango(int numFila, int numFilaInicial, List<int> ftl, ExcelWorksheet hojaResumen, char letraCelda)
+        private void AplicarBordeParcialARango(int numFila, int numFilaInicial, List<int> ftl, ExcelWorksheet hojaResumen, char letraCelda)
         {
             string letra = letraCelda.ToString().ToUpper();
+            string rango = $"{letra}{numFila}";
 
             if (numFila == numFilaInicial)
             {
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Top.Style = ExcelBorderStyle.Thick;
+                LibroExcelHelper.AplicarBordeParcialARango(hojaResumen, rango, Enums.TipoBordeParcial.SupDerIzq);
+                /*hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Top.Style = ExcelBorderStyle.Thick;
                 hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;*/
 
             }
             else if (numFila == (ftl.Count + numFilaInicial - 1))
             {
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+                LibroExcelHelper.AplicarBordeParcialARango(hojaResumen, rango, Enums.TipoBordeParcial.InfDerIzq);
+                /*hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
                 hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;*/
 
             }
             else
             {
+                LibroExcelHelper.AplicarBordeParcialARango(hojaResumen, rango, Enums.TipoBordeParcial.CentroDerIzq);
 
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
-                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+              /*  hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Left.Style = ExcelBorderStyle.Thick;
+                hojaResumen.Cells[$"{letra}{numFila}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;*/
             }
         }
 
