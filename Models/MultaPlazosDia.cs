@@ -13,6 +13,18 @@ namespace MultasLectura.Models
         private double _porcentajeObtenido;
         private double _totalMultaDia;
 
+        public int Dia { get { return _dia; } set { _dia = value; } }
+        public double PorcentajeIncremento { get { return _porcentajeIncremento; } set { _porcentajeIncremento  = value; } }
+        public double PorcentajeObtenido { get { return _porcentajeObtenido; } 
+            set
+            {
+                _porcentajeObtenido = value;
+            }  }
+        public double TotalMultaDia { get { return _totalMultaDia; }
+            set
+            {
+                _totalMultaDia = value;
+            } }
 
     }
 
@@ -25,20 +37,45 @@ namespace MultasLectura.Models
         private double _porcentajeFueraPlazo;
         private double _importeFueraPlazo;
         private double _totalMulta;
+        private string _estadoFinal;
+        private ColorModel _colorEstado;
 
-        private Color _fondo;
-        private Color _letra;
+        public string Tarifa { get { return _tarifa; }
+            set
+            {
+                _tarifa = value;
+            } }
 
-      /*  public string Nombre { get { return _nombre; } set { _nombre = value; } }
-        public Color Fondo { get { return _fondo; } set { _fondo = value; } }
-        public Color Letra { get { return _letra; } set { _letra = value; } }
+        public DiaMulta Dia1 { get { return _1Dia; } set {  _1Dia = value; } }
+        public DiaMulta Dia2 { get { return _2Dia; }
+            set
+            {
+                _2Dia = value;
+            } }
+        public DiaMulta Dia3Mas { get { return _3DiaMas; } set {  _3DiaMas = value; } }
+        public double PorcentajeFueraPlazo { get { return _porcentajeFueraPlazo; } set { _porcentajeFueraPlazo = value; } }
+        public double ImporteFueraPlazo { get { return _importeFueraPlazo; } 
+            set
+            {
+                _importeFueraPlazo = value;
+            } }
+        public double TotalMulta { get { return _totalMulta; } set { _totalMulta = value; } }
+        public string EstadoFinal { get { return _estadoFinal; } set { _estadoFinal = value; } }
+        public ColorModel ColorEstado { get { return _colorEstado; } set { _colorEstado = value; } }
 
-        public ColorModel(string Nombre, Color Fondo, Color Letra)
+        public void DefinirEstadoFinal()
         {
-            this.Nombre = Nombre;
-            this.Fondo = Fondo;
-            this.Letra = Letra;
+            if(_totalMulta > 0)
+            {
+                _estadoFinal = "Multa del Período";
+                _colorEstado = new ColorModel("multa", Color.Red, Color.White);
+            } else
+            {
+                _estadoFinal = "Saldo a Favor del Período";
+                _colorEstado = new ColorModel("saldo a favor", Color.FromArgb(1, 204, 255, 204), Color.White); ;
+            }
+        }
 
-        }*/
+       
     }
 }

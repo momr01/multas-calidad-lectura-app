@@ -1,14 +1,19 @@
-﻿using MultasLectura.Helpers;
+﻿using Aspose.Cells.Drawing;
+using MultasLectura.Helpers;
 using MultasLectura.LibroCalidad.Controllers;
 using MultasLectura.LibroPlazos.Interfaces;
 using MultasLectura.Models;
 using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.Streaming.Values;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table.PivotTable;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
@@ -140,6 +145,9 @@ namespace MultasLectura.LibroPlazos.Controllers
             int totalCantidades = 0;
             int totalEnPlazo = 0;
             int totalFueraDePlazo = 0;
+            int totalK1 = 0;
+            int totalK2 = 0;
+            int totalK3oMas = 0;
 
 
 
@@ -172,6 +180,17 @@ namespace MultasLectura.LibroPlazos.Controllers
                 } else
                 {
                     totalFueraDePlazo += cantidad;
+                }
+
+                if(ftl == -4 || ftl == 2)
+                {
+                    totalK1 += cantidad;
+                } else if(ftl == -5 || ftl == 3)
+                {
+                    totalK2 += cantidad;
+                } else if(ftl <= -6 || ftl >= 4)
+                {
+                    totalK3oMas += cantidad;
                 }
 
 
@@ -292,10 +311,146 @@ namespace MultasLectura.LibroPlazos.Controllers
                 numFila++;
             }
 
-           
 
-          
 
+            double porcentajeUnDia = 0.02;
+
+
+            MultaPlazosDia tabla3 = new()
+            {
+                Tarifa = "t1",
+                ImporteFueraPlazo = 0,
+                PorcentajeFueraPlazo = 0,
+                TotalMulta = 7889,
+
+                Dia1 = new()
+                {
+                    Dia = 1,
+                    PorcentajeIncremento = porcentajeUnDia,
+                    PorcentajeObtenido = (double)totalK1/totalCantidades,
+                    TotalMultaDia = 0,
+                },
+
+                 Dia2 = new()
+                 {
+                     Dia = 2,
+                     PorcentajeIncremento = porcentajeUnDia * 2,
+                     PorcentajeObtenido = (double)totalK2/totalCantidades ,
+                     TotalMultaDia = 0,
+                 },
+
+                  Dia3Mas = new()
+                  {
+                      Dia = 3,
+                      PorcentajeIncremento = porcentajeUnDia * 2 * 2.5,
+                      PorcentajeObtenido = (double)totalK3oMas/totalCantidades,
+                      TotalMultaDia = 0,
+                  }
+            };
+
+            // Obtener el tipo de la instancia
+            Type tipo = tabla3.GetType();
+
+            // Obtener todas las propiedades de la instancia
+            PropertyInfo[] propiedades = tipo.GetProperties();
+
+            // Recorrer las propiedades y sus valores
+
+            numFila++;
+            List<char> letras4 = new() { tarifa.LetraInicial, letra2, letra3, letra4 };
+
+            foreach (PropertyInfo propiedad in propiedades)
+            {
+               // if(propiedad.PropertyType == typeof(int))
+
+
+                string nombre = propiedad.Name;
+                object valor = propiedad.GetValue(tabla3)!;
+
+
+                // MessageBox.Show(nombre);
+                // object value = property.GetValue(person);
+                // Console.WriteLine($"{name}: {value}");
+
+                if (valor != null && valor.GetType() == typeof(DiaMulta))
+                {
+                    Type diaTipo = valor.GetType();
+                    PropertyInfo[] diaProps = diaTipo.GetProperties();
+
+                    foreach (PropertyInfo prop in diaProps)
+                    {
+                        //string nombreDia = prop.Name;
+                       // object addressValue = prop.GetValue(valor);
+                       // Console.WriteLine($"  {addressName}: {addressValue}");
+                    }
+                    for (int i = 0; i < diaProps.Length; i++)
+                    {
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{letras4[i]}{numFila}", diaProps[i].GetValue(valor), Enums.TipoOpCelda.Value);
+                       
+                    }
+
+                    numFila++;
+                } 
+
+
+
+               /* if (nombre.ToLower().Contains("dia"))
+                {
+                    // Obtener el tipo de la instancia
+                    Type tipoDia = propiedad.GetType();
+
+                    // Obtener todas las propiedades de la instancia
+                    PropertyInfo[] propsDia = tipoDia.GetProperties();
+
+                  //  foreach(PropertyInfo prop in propsDia)
+                  //  {
+                   //     LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{}{fila}", valor, Enums.TipoOpCelda.Value);
+                   // }
+                   for(int i = 0; i < propsDia.Length; i++)
+                    {
+                        string jjj = propsDia[i].GetValue(tipoDia)!.ToString()!;
+                        MessageBox.Show(jjj);
+                        LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{letras4[i]}{numFila}", 0, Enums.TipoOpCelda.Value);
+                    }
+
+
+                   // FilaDiaTabla3(hojaResumen, new() { tarifa.LetraInicial, letra2, letra3, letra4}, numFila, 5);
+                }*/
+
+                
+            }
+
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila}", "Total Fuera Plazo", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", tabla3.PorcentajeFueraPlazo, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{cuarLetra}{numFila}", tabla3.ImporteFueraPlazo, Enums.TipoOpCelda.Value);
+
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 1}", "Total a Multar", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila + 1}", tabla3.TotalMulta, Enums.TipoOpCelda.Value);
+
+            tabla3.DefinirEstadoFinal();
+            LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila + 2}", tabla3.EstadoFinal, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.ColorFondoLetra(hojaResumen, letra3, numFila + 2, tabla3.ColorEstado);
+
+
+            //  for( int i = 0; i < 5; i++)
+            //{
+
+
+            //}
+
+
+
+
+
+
+        }
+
+        private void FilaDiaTabla3(ExcelWorksheet hoja, List<char> letras, int fila, double valor)
+        {
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"{letras[0]}{fila}", valor, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"{letras[1]}{fila}", valor, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"{letras[2]}{fila}", valor, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"{letras[3]}{fila}", valor, Enums.TipoOpCelda.Value);
         }
 
         private void CargarDatosColK(int ftl, ExcelWorksheet hojaResumen, int numFila, string letra)
