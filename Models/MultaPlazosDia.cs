@@ -72,8 +72,18 @@ namespace MultasLectura.Models
             } else
             {
                 _estadoFinal = "Saldo a Favor del Período";
-                _colorEstado = new ColorModel("saldo a favor", Color.FromArgb(1, 204, 255, 204), Color.White); ;
+                _colorEstado = new ColorModel("saldo a favor", Color.FromArgb(1, 204, 255, 204), Color.Black); ;
             }
+        }
+
+        public void CalcularImporteFueraPlazo()
+        {
+            _importeFueraPlazo = Dia1.TotalMultaDia + Dia2.TotalMultaDia + Dia3Mas.TotalMultaDia;
+        }
+
+        public void CalcularTotalAMultar(double bonificacion)
+        {
+            _totalMulta = _importeFueraPlazo - bonificacion;
         }
 
        

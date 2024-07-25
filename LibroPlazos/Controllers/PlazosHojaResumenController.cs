@@ -11,6 +11,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml.Table.PivotTable;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -146,8 +147,11 @@ namespace MultasLectura.LibroPlazos.Controllers
             int totalEnPlazo = 0;
             int totalFueraDePlazo = 0;
             int totalK1 = 0;
+            double importeK1 = 0;
             int totalK2 = 0;
+            double importeK2 = 0;
             int totalK3oMas = 0;
+            double importeK3oMas = 0;
 
 
 
@@ -185,12 +189,16 @@ namespace MultasLectura.LibroPlazos.Controllers
                 if(ftl == -4 || ftl == 2)
                 {
                     totalK1 += cantidad;
+                    //importeK1 += (double)cantidad * int.Parse(hojaResumen.Cells[$"{segLetra}{numFila}"].Value.ToString());
+                    importeK1 += CalcularImporteK(cantidad, hojaResumen, segLetra, numFila);
                 } else if(ftl == -5 || ftl == 3)
                 {
                     totalK2 += cantidad;
+                    importeK2 += CalcularImporteK(cantidad, hojaResumen, segLetra, numFila);
                 } else if(ftl <= -6 || ftl >= 4)
                 {
                     totalK3oMas += cantidad;
+                    importeK3oMas += CalcularImporteK(cantidad, hojaResumen, segLetra, numFila);
                 }
 
 
@@ -226,6 +234,8 @@ namespace MultasLectura.LibroPlazos.Controllers
                 { "Bonificación", new Generics(bonificacion) }
             };
 
+            double importeBonif = 0;
+
             var keys = valoresTabla2.Keys;
 
             for (int  i = 0; i < valoresTabla2.Count; i++)
@@ -254,7 +264,7 @@ namespace MultasLectura.LibroPlazos.Controllers
                     if (i == 3)
                     {
                         string textoBonifica = "No Bonifica";
-                        double importeBonif = 0;
+                      //  double importeBonif = 0;
                         ColorModel colores = new("no bonifica", Color.Red, Color.White);
 
                         if (lista[0] == 1)
@@ -314,37 +324,42 @@ namespace MultasLectura.LibroPlazos.Controllers
 
 
             double porcentajeUnDia = 0.02;
+            double porcentajeDosDias = porcentajeUnDia * 2;
+            double porcentajeMasTresDias = porcentajeDosDias * 2.5;
+
+
 
 
             MultaPlazosDia tabla3 = new()
             {
                 Tarifa = "t1",
-                ImporteFueraPlazo = 0,
-                PorcentajeFueraPlazo = 0,
-                TotalMulta = 7889,
+               // ImporteFueraPlazo = 0,
+                PorcentajeFueraPlazo = porcentajeUnDia + porcentajeDosDias + porcentajeMasTresDias,
+              //  TotalMulta = 7889,
 
                 Dia1 = new()
                 {
                     Dia = 1,
                     PorcentajeIncremento = porcentajeUnDia,
-                    PorcentajeObtenido = (double)totalK1/totalCantidades,
-                    TotalMultaDia = 0,
+                    PorcentajeObtenido = (double)totalK1 / totalCantidades,
+                    // TotalMultaDia = (porcentajeUnDia * tarifa.Baremos) * importeK1,
+                    TotalMultaDia = CalcularTotalMultaDia(porcentajeUnDia, tarifa.Baremos, importeK1),
                 },
 
                  Dia2 = new()
                  {
                      Dia = 2,
-                     PorcentajeIncremento = porcentajeUnDia * 2,
+                     PorcentajeIncremento = porcentajeDosDias,
                      PorcentajeObtenido = (double)totalK2/totalCantidades ,
-                     TotalMultaDia = 0,
+                     TotalMultaDia = CalcularTotalMultaDia(porcentajeDosDias, tarifa.Baremos, importeK2),
                  },
 
                   Dia3Mas = new()
                   {
                       Dia = 3,
-                      PorcentajeIncremento = porcentajeUnDia * 2 * 2.5,
+                      PorcentajeIncremento = porcentajeMasTresDias,
                       PorcentajeObtenido = (double)totalK3oMas/totalCantidades,
-                      TotalMultaDia = 0,
+                      TotalMultaDia = CalcularTotalMultaDia(porcentajeMasTresDias, tarifa.Baremos, importeK3oMas),
                   }
             };
 
@@ -420,10 +435,12 @@ namespace MultasLectura.LibroPlazos.Controllers
                 
             }
 
+            tabla3.CalcularImporteFueraPlazo();
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila}", "Total Fuera Plazo", Enums.TipoOpCelda.Value);
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila}", tabla3.PorcentajeFueraPlazo, Enums.TipoOpCelda.Value);
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{cuarLetra}{numFila}", tabla3.ImporteFueraPlazo, Enums.TipoOpCelda.Value);
 
+            tabla3.CalcularTotalAMultar(importeBonif);
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 1}", "Total a Multar", Enums.TipoOpCelda.Value);
             LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{tercLetra}{numFila + 1}", tabla3.TotalMulta, Enums.TipoOpCelda.Value);
 
@@ -437,12 +454,25 @@ namespace MultasLectura.LibroPlazos.Controllers
 
 
             //}
+           // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 6}", "FUERA DE PLAZO DEL PERIODO", Enums.TipoOpCelda.Value);
+           // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 10}", "BONIFICACION DEL PERIODO", Enums.TipoOpCelda.Value);
 
 
 
 
 
 
+
+        }
+
+        private double CalcularImporteK(int cantidad, ExcelWorksheet hoja, string letra, int fila)
+        {
+            return (double)cantidad * int.Parse(hoja.Cells[$"{letra}{fila}"].Value.ToString()!);
+        }
+
+        private double CalcularTotalMultaDia(double porcentaje, double baremos, double importeK)
+        {
+            return (porcentaje * baremos) * importeK;
         }
 
         private void FilaDiaTabla3(ExcelWorksheet hoja, List<char> letras, int fila, double valor)
