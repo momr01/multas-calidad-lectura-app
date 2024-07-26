@@ -1,42 +1,12 @@
-﻿using Aspose.Cells.Drawing;
-using MultasLectura.Helpers;
-using MultasLectura.LibroCalidad.Controllers;
+﻿using MultasLectura.Helpers;
 using MultasLectura.LibroPlazos.Interfaces;
 using MultasLectura.Models;
-using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.Streaming.Values;
 using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using OfficeOpenXml.Table.PivotTable;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Text;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace MultasLectura.LibroPlazos.Controllers
 {
-    public class Generics
-    {
-        public object Value { get; set; }
-
-        public Generics(object value)
-        {
-            Value = value;
-        }
-
-        public T GetValue<T>()
-        {
-            return (T)Value;
-        }
-    }
-
-
     public class PlazosHojaResumenController : IPlazosHojaResumenController
     {
         private readonly BaremoModel _baremos;
@@ -46,8 +16,10 @@ namespace MultasLectura.LibroPlazos.Controllers
             _baremos = baremos;
         }
 
-        public void CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles)
+        public Dictionary<string, double> CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles, ref int numFila)
         {
+            Dictionary<string, double> totales = new();
+
             List<TarifaPlazosModel> tarifas = new()
             {
                 new("t1", "itinerario t1", "días hábiles t1", 'a', _baremos.T1),
@@ -57,13 +29,59 @@ namespace MultasLectura.LibroPlazos.Controllers
                 new("altura t3", "altura t3", "días hábiles altura t3", 'u', _baremos.AlturaT3)
             };
 
+            double totalBonifT1 = 0;
+            double totalBonifT2 = 0;
+            double totalMultaT1 = 0;
+            double totalMultaT2 = 0;
+
+            //int numFila = 1;
+
             foreach(TarifaPlazosModel tarifa in tarifas)
             {
-                CrearTablaDatosPorTarifa(hojaResumen, hojaReclDetalles, tarifa);
+                Dictionary<string, double> valores = CrearTablaDatosPorTarifa(hojaResumen, hojaReclDetalles, tarifa, ref numFila);
+
+                if (tarifa.Tarifa == "t2")
+                {
+                    totalBonifT2 += valores["bonificacion"];
+                    totalMultaT2 += valores["multa"];
+                } else
+                {
+                    totalBonifT1 += valores["bonificacion"];
+                    totalMultaT1 += valores["multa"];
+                }
             }
-           
 
 
+            //  CrearTablaFueraPlazoResumen(hojaResumen, totalMultaT1, totalMultaT2, ref numFila);
+            //  CrearTablaBonificacionResumen();
+
+            totales["bonificacionT1"] = totalBonifT1;
+            totales["bonificacionT2"] = totalBonifT2;
+            totales["multaT1"] = totalMultaT1;
+            totales["multaT2"] = totalMultaT2;
+
+            return totales;
+
+
+        }
+
+        private void CrearTablaFueraPlazoResumen(ExcelWorksheet hoja, double importeT1, double importeT2, ref int numFila)
+        {
+            double total = importeT1 + importeT2;
+            numFila += 10;
+
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"A{numFila}", "FUERA DE PLAZO DEL PERÍODO", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila}", "T1", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila}", importeT1, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila + 1}", "T2", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila + 1}", importeT2, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila + 2}", "Total", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila + 2}", total, Enums.TipoOpCelda.Value);
+
+        }
+
+        private void CrearTablaBonificacionResumen()
+        {
 
         }
 
@@ -96,10 +114,12 @@ namespace MultasLectura.LibroPlazos.Controllers
             return (char)asciiCode;
         }
 
-        private void CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles, TarifaPlazosModel tarifa )
+        private Dictionary<string,double> CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles, TarifaPlazosModel tarifa, ref int numFila)
         {
+            Dictionary<string, double> importesFinales = new();
             int numFilaInicial = 3;
-            int numFila = 3;
+            //int numFila = 3;
+            numFila = 3;
 
             string primLetra = tarifa.LetraInicial.ToString().ToUpper();
             char letra2 = ObtenerLetraSiguiente(tarifa.LetraInicial);
@@ -454,14 +474,15 @@ namespace MultasLectura.LibroPlazos.Controllers
 
 
             //}
-           // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 6}", "FUERA DE PLAZO DEL PERIODO", Enums.TipoOpCelda.Value);
-           // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 10}", "BONIFICACION DEL PERIODO", Enums.TipoOpCelda.Value);
+            // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 6}", "FUERA DE PLAZO DEL PERIODO", Enums.TipoOpCelda.Value);
+            // LibroExcelHelper.AsignarValorFormulaACelda(hojaResumen, $"{primLetra}{numFila + 10}", "BONIFICACION DEL PERIODO", Enums.TipoOpCelda.Value);
+
+            importesFinales["multa"] = tabla3.ImporteFueraPlazo;
+            importesFinales["bonificacion"] = importeBonif;
 
 
 
-
-
-
+            return importesFinales;
 
         }
 
@@ -626,9 +647,19 @@ namespace MultasLectura.LibroPlazos.Controllers
             atraso.Sort = eSortType.Ascending;
         }
 
-        public void CrearTablaImportesFinales()
+        public void CrearTablaImportesFinales(ExcelWorksheet hoja, double importeT1, double importeT2, ref int numFila)
         {
-            throw new NotImplementedException();
+            double total = importeT1 + importeT2;
+            numFila += 10;
+
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"A{numFila}", "FUERA DE PLAZO DEL PERÍODO", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila}", "T1", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila}", importeT1, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila + 1}", "T2", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila + 1}", importeT2, Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"F{numFila + 2}", "Total", Enums.TipoOpCelda.Value);
+            LibroExcelHelper.AsignarValorFormulaACelda(hoja, $"G{numFila + 2}", total, Enums.TipoOpCelda.Value);
+
         }
 
 

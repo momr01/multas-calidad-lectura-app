@@ -51,8 +51,11 @@ namespace MultasLectura.LibroPlazos.Controllers
 
         private void AgregarContenidoHojaResumen(ExcelWorksheet hojaResumen,ExcelWorksheet hojaPlazosDetalles, ExcelRange rango)
         {
+            int numFila = 1;
+
             _hojaResumenController.CrearTablaDinCertAtrasoTotal(hojaResumen, rango);
-            _hojaResumenController.CrearTablaDatosPorTarifa(hojaResumen, hojaPlazosDetalles);
+            Dictionary<string, double> importesFinales = _hojaResumenController.CrearTablaDatosPorTarifa(hojaResumen, hojaPlazosDetalles, ref numFila);
+            _hojaResumenController.CrearTablaImportesFinales(hojaResumen, importesFinales["multaT1"], importesFinales["multaT2"], ref numFila);
 
         }
     }

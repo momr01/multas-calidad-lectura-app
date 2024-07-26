@@ -11,11 +11,7 @@ namespace MultasLectura.LibroPlazos.Interfaces
     public interface IPlazosHojaResumenController
     {
         void CrearTablaDinCertAtrasoTotal(ExcelWorksheet hoja, ExcelRange rango);
-        /*Dictionary<string, double> CrearTablaMetodoLineal(ExcelWorksheet hojaResumen, ExcelWorksheet hojaBase, BaremoModel baremos);
-        Dictionary<string, double> CrearTablaTotales(ExcelWorksheet hoja, Dictionary<string, double> totales, Dictionary<string, int> reclamos, BaremoModel baremos, ExcelWorksheet hojaCalXOperario, double importeCertificacion);
-        void CrearTablaValorFinalMulta(ExcelWorksheet hoja, double propInconformidades, double importeTotalMetLineal, double importeTotalCertificacion, MetaModel metas);
-        void CrearTablaBaremosMetas(ExcelWorksheet hoja, BaremoModel baremos, MetaModel metas, double propInconformidades);*/
-        void CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles);
-        void CrearTablaImportesFinales();
+        Dictionary<string, double> CrearTablaDatosPorTarifa(ExcelWorksheet hojaResumen, ExcelWorksheet hojaReclDetalles, ref int numFila);
+        void CrearTablaImportesFinales(ExcelWorksheet hoja, double importeT1, double importeT2, ref int numFila);
     }
 }
